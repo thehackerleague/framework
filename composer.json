@@ -1,0 +1,28 @@
+{
+    "name": "thl/framework",
+    "description": "The THL Framework.",
+    "keywords": ["framework", "thl"],
+    "license": "MIT",
+    "homepage": "https://thehackerleague.com",
+    "support": {
+        "issues": "https://github.com/thl/framework/issues",
+        "source": "https://github.com/thl/framework"
+    },
+    "authors": [
+        {
+            "name": "Sunel Tr",
+            "email": "sunelbe@gmail.com"
+        }
+    ],
+    "require": {
+        "laravel/framework": "5.3.*",
+        "marcj/topsort": "1.0.0"
+    },
+    "autoload": {
+        "files": [
+        ],
+        "psr-4": {
+            "Thl\\": "src/Thl/"
+        }
+    }
+}
