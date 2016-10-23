@@ -27,6 +27,9 @@ split()
     done
 
     popd
+    rm -rf $SUBDIR;
 }
 
-split theme src/Thl/Theme:git@github.com:thl-framework/theme.git "master"
+split theme     src/Thl/Theme:git@github.com:thl-framework/theme.git        "master"
+split view      src/Thl/View:git@github.com:thl-framework/view.git          "master"
+split backend   src/Thl/Backend:git@github.com:thl-framework/backend.git    "master"
