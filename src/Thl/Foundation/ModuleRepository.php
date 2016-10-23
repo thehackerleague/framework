@@ -75,10 +75,14 @@ class ModuleRepository
 
         $config = $this->app['config'];
         $config->set('module.manifest', $manifest);
-        $themes = collect($manifest['themes'])->map(function ($item, $key) {
-            return new Theme($item);
-        })->toArray();
-        $config->set('theme.themes', $themes);
+
+        foreach ($manifest['themes'] as $area => $themes) {
+            $config->set('theme.'.$area.'.themes',
+                collect($themes)->map(function ($item, $key) {
+                        return new Theme($item);
+                })->toArray()
+            );
+        }
         $config->set('app.providers', $manifest['providers']);
         $config->set('app.aliases', $manifest['aliases']);
     }
@@ -106,7 +110,7 @@ class ModuleRepository
                     }
                     $manifest['modules'][$key] = $module;
                 } else {
-                    $manifest['themes'][$key] = $module;
+                    $manifest['themes'][$module['area']][$key] = $module;
                 }
             }
         }
