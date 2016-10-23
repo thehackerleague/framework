@@ -15,8 +15,6 @@ class ThemeServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadViewsFrom(__DIR__.'/../view', 'theme');
-        $this->loadAssetsFrom(__DIR__.'/../assets', 'theme');
     }
 
     /**

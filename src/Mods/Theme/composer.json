@@ -1,12 +1,12 @@
 {
-    "name": "thl/theme",
-    "description": "The THL Framework.",
-    "keywords": ["framework", "thl"],
+    "name": "mods/theme",
+    "description": "The Mods Theme package.",
+    "keywords": ["framework", "mods", "theme"],
     "license": "MIT",
     "homepage": "https://thehackerleague.com",
     "support": {
-        "issues": "https://github.com/thl/framework/issues",
-        "source": "https://github.com/thl/framework"
+        "issues": "https://github.com/thehackerleague/framework/issues",
+        "source": "https://github.com/thehackerleague/framework"
     },
     "authors": [
         {
@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "thl/view":"*"
+        "mods/view":"*"
     },
     "autoload": {
         "psr-4": {

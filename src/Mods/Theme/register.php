@@ -14,7 +14,7 @@ return [
         ],
         'autoload' => [
             'psr-4' => [
-                'Mods\\Theme\\' => realpath(__DIR__.'/src/')
+                'Mods\\Theme\\' => realpath(__DIR__.'/')
             ]
         ]
     ]

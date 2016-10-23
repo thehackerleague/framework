@@ -1,6 +1,6 @@
 {
-    "name": "mods/framework",
-    "description": "The Mods Framework.",
+    "name": "mods/http",
+    "description": "The Mods Http package.",
     "keywords": ["framework", "mods"],
     "license": "MIT",
     "homepage": "https://thehackerleague.com",
@@ -15,15 +15,10 @@
         }
     ],
     "require": {
-        "laravel/framework": "5.3.*",
-        "sunel/layout-core": "dev-master",
-        "marcj/topsort": "1.0.0"
     },
     "autoload": {
-        "files": [
-        ],
         "psr-4": {
-            "Mods\\": "src/Mods/"
+            "Mods\\Http\\": ""
         }
     }
 }

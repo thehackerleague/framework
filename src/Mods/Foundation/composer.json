@@ -1,7 +1,7 @@
 {
-    "name": "thl/foundation",
-    "description": "The THL Framework.",
-    "keywords": ["framework", "thl"],
+    "name": "mods/foundation",
+    "description": "The Mods Framework.",
+    "keywords": ["framework", "mods"],
     "license": "MIT",
     "homepage": "https://thehackerleague.com",
     "support": {
