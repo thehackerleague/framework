@@ -1,0 +1,28 @@
+{
+    "name": "thl/theme",
+    "description": "The THL Framework.",
+    "keywords": ["framework", "thl"],
+    "license": "MIT",
+    "homepage": "https://thehackerleague.com",
+    "support": {
+        "issues": "https://github.com/thl/framework/issues",
+        "source": "https://github.com/thl/framework"
+    },
+    "authors": [
+        {
+            "name": "Sunel Tr",
+            "email": "sunelbe@gmail.com"
+        }
+    ],
+    "require": {
+        "sunel/layout-core":"*",
+        "illuminate/events": "5.3.*",
+        "illuminate/cache": "5.3.*",
+        "illuminate/config": "5.3.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mods\\Theme\\": ""
+        }
+    }
+}

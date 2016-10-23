@@ -1,0 +1,24 @@
+{
+    "name": "thl/foundation",
+    "description": "The THL Framework.",
+    "keywords": ["framework", "thl"],
+    "license": "MIT",
+    "homepage": "https://thehackerleague.com",
+    "support": {
+        "issues": "https://github.com/thl/framework/issues",
+        "source": "https://github.com/thl/framework"
+    },
+    "authors": [
+        {
+            "name": "Sunel Tr",
+            "email": "sunelbe@gmail.com"
+        }
+    ],
+    "require": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Mods\\Foundation\\": ""
+        }
+    }
+}
