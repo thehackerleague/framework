@@ -30,8 +30,8 @@ split()
     rm -rf $SUBDIR;
 }
 
-split foundation    src/Mods/Theme:git@github.com:mods-framework/foundation.git     "master"
-split http          src/Mods/Theme:git@github.com:mods-framework/http.git           "master"
-split support       src/Mods/Theme:git@github.com:mods-framework/support.git        "master"
-split theme         src/Mods/Theme:git@github.com:mods-framework/theme.git          "master"
-split view          src/Mods/View:git@github.com:mods-framework/view.git            "master"
+split foundation    src/Mods/Foundation:git@github.com:mods-framework/foundation.git    "master"
+split http          src/Mods/Http:git@github.com:mods-framework/http.git                "master"
+split support       src/Mods/Support:git@github.com:mods-framework/support.git          "master"
+split theme         src/Mods/Theme:git@github.com:mods-framework/theme.git              "master"
+split view          src/Mods/View:git@github.com:mods-framework/view.git                "master"
