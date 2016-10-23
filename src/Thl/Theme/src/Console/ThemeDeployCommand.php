@@ -52,14 +52,28 @@ class ThemeDeployCommand extends Command
      */
     public function fire()
     {
-        //$this->call('theme:clear');
-
         $app = $this->getFreshAsset();
+        $area = null;
+        if($this->hasOption('area')) {
+            $area = $this->option('area');
+        }
+        $theme = null;
+        if($this->hasOption('theme')) {
+            $theme = $this->option('theme');
+        }
+        $module = null;
+        if($this->hasOption('module')) {
+            $module = $this->option('module');
+        }
 
-        $theme = $app['theme.deployer']->setConsole($this)->deploy();
+        $deployer = $app['theme.deployer']->setConsole($this);
+
+        $deployer->clear($area, $theme, $module);
+
+        $deployer->deploy($area, $theme, $module);
 
         $this->info("\n");
-        $this->info("Theme {$theme} deployed successfully!");
+        $this->info("Deployed successfully!");
     }
 
     /**

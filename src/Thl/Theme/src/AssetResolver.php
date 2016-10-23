@@ -181,9 +181,15 @@ class AssetResolver
      *
      * @return array
      */
-    public function getPaths()
+    public function getPaths($area = null, $theme = null)
     {
-        return $this->paths;
+        if($area && isset($this->paths[$area])) {
+            if($theme && isset($this->paths[$area][$theme])) {
+                return [$theme => $this->paths[$area][$theme]];
+            }
+            return $this->paths[$area];
+        }
+        return [];
     }
 
     /**
@@ -191,8 +197,14 @@ class AssetResolver
      *
      * @return array
      */
-    public function getHints()
+    public function getHints($area = null, $namespace = null)
     {
-        return $this->hints;
+        if($area && isset($this->hints[$area])) {
+            if($namespace && isset($this->hints[$area][$namespace])) {
+                return [$namespace => $this->hints[$area][$namespace]];
+            }
+            return $this->hints[$area];
+        }
+        return [];
     }
 }

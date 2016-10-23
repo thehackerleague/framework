@@ -168,11 +168,14 @@ class Factory
         $areas = array_merge(['frontend'], array_values($app['config']->get('app.areas', [])));
         $assetPaths = [];
         foreach ($areas as $area) {
-            $paths = $this->themeResolver->getPaths($area)->toArray();
-            foreach ($paths as $path) {
-                if (is_dir($appPath = $path.'/assets/')) {
-                    $assetPaths[$area][] = $appPath;
-                }
+            $themes = $this->themeResolver->themeCollection($area);
+            foreach ($themes as $key => $theme) {
+                $paths = $this->themeResolver->getPaths($area, $key)->toArray();
+                foreach ($paths as $path) {
+                    if (is_dir($appPath = $path.'/assets/')) {
+                        $assetPaths[$area][$key][] = $appPath;
+                    }
+                } 
             }
         }
         $app['theme.asset.resolver']->addLocation($assetPaths);

@@ -38,43 +38,54 @@ class ThemeResolver
         $this->config = $config;
     }
 
-    public function getActive($type = 'frontend')
+    public function getActive($area = 'frontend')
     {
-        return $this->config->get("theme.{$type}.active");
+        return $this->config->get("theme.{$area}.active");
     }
 
-    public function getPaths($type = 'frontend')
+    public function getPaths($area = 'frontend', $theme = null)
     {
-        $paths = $this->themeCollection($type)
+        $paths = $this->activeThemeCollection($area, $theme)
             ->map(function ($theme, $key) {
                 return $theme->getPath();
             });
         return $paths;
     }
 
-    protected function themeCollection($type = 'frontend')
+    public function activeThemeCollection($area = 'frontend', $theme = null)
     {
+        if (!$theme) {
+            $theme = $this->getActive($area);
+        }
         $themeCollection = Collection::make();
-        if ($active = $this->getActive($type)) {
-            $active = $this->getTheme($active);
-            $themeCollection->put(null, $active);
-            while ($parent = $this->getParent($active)) {
-                $parent = $this->getTheme($parent);
-                $themeCollection->put(null, $parent);
-                $active = $parent;
-            }
+        $active = $this->getTheme($theme, $area);
+        $themeCollection->put(null, $active);
+        while ($parent = $this->getParent($active)) {
+            $parent = $this->getTheme($parent, $area);
+            $themeCollection->put(null, $parent);
+            $active = $parent;
         }
         return $themeCollection;
     }
 
-    public function getTheme($key)
+    public function themeCollection($area = 'frontend')
+    {
+        $themes = $this->config->get(
+            "theme.{$area}.themes",
+            []
+        );
+        $themeCollection = Collection::make($themes);
+        return $themeCollection;
+    } 
+
+    public function getTheme($key, $area)
     {
         $theme = $this->config->get(
-            'theme.themes.'.$key,
+            "theme.{$area}.themes.{$key}",
             false
         );
         if (!$theme) {
-            throw new InvalidArgumentException("Theme {$this->getActive()} not found.");
+            throw new InvalidArgumentException("Theme {$key} not found.");
         }
 
         return $theme;

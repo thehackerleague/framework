@@ -12,5 +12,10 @@ return [
         'depends' => [
             'thl_view'
         ],
+        'autoload' => [
+            'psr-4' => [
+                'Thl\\Theme\\' => realpath(__DIR__.'/src/')
+            ]
+        ]
     ]
 ];

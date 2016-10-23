@@ -4,6 +4,7 @@ namespace Thl\Theme;
 
 use Thl\Support\ServiceProvider;
 use Thl\Theme\Console\ThemeDeployCommand;
+use Thl\Theme\Console\ThemeClearCommand;
 
 class ThemeServiceProvider extends ServiceProvider
 {
@@ -14,7 +15,8 @@ class ThemeServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->loadViewsFrom(__DIR__.'/../view', 'theme');
+        $this->loadAssetsFrom(__DIR__.'/../assets', 'theme');
     }
 
     /**
@@ -59,7 +61,10 @@ class ThemeServiceProvider extends ServiceProvider
         $this->app->singleton('command.theme.deploy', function ($app) {
             return new ThemeDeployCommand($app['files']);
         });
-        $this->commands(['command.theme.deploy']);
+        $this->app->singleton('command.theme.clear', function ($app) {
+            return new ThemeClearCommand($app['files']);
+        });
+        $this->commands(['command.theme.deploy', 'command.theme.clear']);
 
         $this->app->singleton('theme.deployer', function ($app) {
             return new Deployer($app['files'], $app['theme.asset.resolver'], $app['config']);
@@ -74,7 +79,7 @@ class ThemeServiceProvider extends ServiceProvider
     public function provides()
     {
         if (!$this->app->environment('production')) {
-            return ['command.theme.deploy'];
+            return ['command.theme.deploy', 'command.theme.clear'];
         }
     }
 }

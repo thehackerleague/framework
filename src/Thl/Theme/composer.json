@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "sunel/layout-core":"*"
+        "thl/view":"*"
     },
     "autoload": {
         "psr-4": {
