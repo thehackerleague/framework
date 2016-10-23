@@ -2,7 +2,7 @@
 
 namespace Thl\View;
 
-use Layout\Core\Block as BaseBlock;
+use Layout\Core\Block\AbstractBlock as BaseBlock;
 
 class Block extends BaseBlock
 {

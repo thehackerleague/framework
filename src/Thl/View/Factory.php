@@ -2,8 +2,7 @@
 
 namespace Thl\View;
 
-use Layout\Core\Layout;
-use Layout\Core\Factory as LayoutFactory;
+use Layout\Core\PageFactory;
 
 class Factory
 {
@@ -12,30 +11,13 @@ class Factory
      */
     protected $factory;
 
-    /**
-     * @var \Layout\Core\Layout $layout
-     */
-    protected $layout;
-
-    public function __construct(LayoutFactory $factory, Layout $layout)
+    public function __construct(PageFactory $factory)
     {
         $this->factory = $factory;
-        $this->layout = $layout;
     }
-
-    public function getLayout()
-    {
-        return $this->layout;
-    }
-
-    public function render(
-        $handles = null,
-        $generateBlocks = true,
-        $generateXml = true,
-        $disableRouteHandle = false
-    ) {
-        $factory = $this->factory->setLayout($this->layout);
-        $html = $factory->render($handles, $generateBlocks, $generateXml, $disableRouteHandle);
-        return view('root', ['html' => $html]);
+    
+    public function render() {
+        $html = $this->factory->render();
+        return view('root', $html);
     }
 }
