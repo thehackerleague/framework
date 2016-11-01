@@ -30,15 +30,15 @@ class ViewServiceProvider extends ServiceProvider
             return new Layout\Cache($app['cache']);
         });
 
-        $this->app->bind('layout.event', function ($app) {
+        $this->app->singleton('layout.event', function ($app) {
             return new Layout\Event($app['events']);
         });
 
-        $this->app->bind('layout.config', function ($app) {
+        $this->app->singleton('layout.config', function ($app) {
             return new Layout\Config($app['config']);
         });
 
-        $this->app->bind('layout.profile', function ($app) {
+        $this->app->singleton('layout.profile', function ($app) {
             return new Layout\Profiler();
         });
     }
