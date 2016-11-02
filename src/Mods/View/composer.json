@@ -21,6 +21,9 @@
         "illuminate/config": "5.3.*"
     },
     "autoload": {
+        "files": [
+            "helpers.php",
+        ],
         "psr-4": {
             "Mods\\Theme\\": ""
         }

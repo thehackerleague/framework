@@ -4,7 +4,7 @@ namespace Mods\View;
 
 use Layout\Core\Block\AbstractBlock as BaseBlock;
 
-class Block extends BaseBlock
+abstract class Block extends BaseBlock
 {
     /**
      * Get relevant path to template.

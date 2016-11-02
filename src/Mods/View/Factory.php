@@ -20,4 +20,8 @@ class Factory
         $html = $this->factory->render();
         return view('root', $html);
     }
+
+    public function getLayoutFactory() {
+        return $this->factory;
+    }
 }
