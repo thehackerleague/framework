@@ -121,6 +121,12 @@ class ModuleRepository
             echo($e->getMessage());
             exit(0);
         }
+        $notFoundModule = array_diff($activeModules, $manifest['relsoved']);        
+        if(count($notFoundModule)) {
+            $word = (count($notFoundModule) > 1)?'Modules':'Module';
+            echo(implode(', ', $notFoundModule). " $word not Found");
+            exit(0); 
+        }
 
         foreach ($manifest['relsoved'] as $code) {
             $manifest['providers'] = array_merge(
