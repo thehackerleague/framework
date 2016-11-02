@@ -2,7 +2,6 @@
 
 namespace  Mods\Theme;
 
-use InvalidArgumentException;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
@@ -67,14 +66,12 @@ class Deployer
         } else {
             $areas = array_merge(['frontend'], array_values($this->config->get('app.areas', [])));
         }
-        $config['areas'] = $areas;
         foreach ($areas as $area) {
             $this->info("\n");
             $this->line("Deloying asset for {$area} section");
             $areaHints = $this->assetResolver->getHints($area, $module);
             $areaPaths = $this->assetResolver->getPaths($area, $theme);
             foreach ($areaPaths as $themekey => $locations) {
-                $config[$area]['themes'][] = $themekey;
                 $this->info("\n");
                 $this->line("Deloying asset for {$themekey} theme in {$area} section");
                 foreach ($areaHints as $namespace => $location) {
@@ -89,8 +86,6 @@ class Deployer
                     $this->movePathAsset($location, $area, $themekey);
                 }
             }
-            
-            $this->writeConfig($config);
 
             $this->info("\n");
             $this->line("Deloyed asset for {$area} section");
@@ -151,7 +146,7 @@ class Deployer
         foreach ($areaPaths as $themekey => $locations) {
             foreach (['sass' => 'scss','less' => 'less'] as $lang => $ext) {
                $themePath = $this->getPath(
-                    [$this->basePath, 'assets', $lang, $area, $themekey]
+                    [$this->basePath, 'assets', $area, $themekey, $lang]
                 );
                if($this->files->exists($themePath)) {
                     $import = [];
@@ -169,10 +164,11 @@ class Deployer
         $this->info("\n");
         $this->line("Deploying files from `{$namespace}` module.");
         $assetType = $this->config->get('theme.asset', []);
-        foreach ($assetType as $type => $resourcePath) {
+        $resourcePath = 'assets';
+        foreach ($assetType as $type) {
             if ($this->files->copyDirectory(
                 $this->getPath([$location,$type]),
-                $this->getPath([$this->basePath,$resourcePath,$area,$theme,$namespace])
+                $this->getPath([$this->basePath,$resourcePath,$area,$theme,$type,$namespace])
             )) {
                 $this->info("Moving `{$type}`.");
             } else {
@@ -185,10 +181,11 @@ class Deployer
     {
         $this->line("Clearing files from `{$namespace}` module.");
         $assetType = $this->config->get('theme.asset', []);
-        foreach ($assetType as $type => $resourcePath) {
+        $resourcePath = 'assets';
+        foreach ($assetType as $type) {
             $this->info("Cleaing `{$type}`.");
             $this->files->cleanDirectory($this->getPath([
-                $this->basePath,$resourcePath,$area,$theme,$namespace
+                $this->basePath,$resourcePath,$area,$theme,$type,$namespace
             ]));
         }
     }
@@ -198,10 +195,11 @@ class Deployer
         $this->info("\n");
         $this->line("Deploying files from `{$location}` location.");
         $assetType = $this->config->get('theme.asset', []);
-        foreach ($assetType as $type => $resourcePath) {
+        $resourcePath = 'assets';
+        foreach ($assetType as $type) {
             if ($this->files->copyDirectory(
                 $this->getPath([$location,$type]),
-                $this->getPath([$this->basePath,$resourcePath,$area,$theme])
+                $this->getPath([$this->basePath,$resourcePath,$area,$theme,$type])
             )) {
                 $this->info("Moving `{$type}`.");
             } else {
@@ -214,28 +212,13 @@ class Deployer
     {
         $this->line("Clearing files from `{$location}` location.");
         $assetType = $this->config->get('theme.asset', []);
-        foreach ($assetType as $type => $resourcePath) {
+        $resourcePath = 'assets';
+        foreach ($assetType as $type) {
             $this->info("Cleaing `{$type}`.");
             $this->files->cleanDirectory($this->getPath([
-                $this->basePath,$resourcePath,$area,$theme
+                $this->basePath,$resourcePath,$area,$theme,$type
             ]));
         }
-    }
-
-    protected function writeConfig($manifest)
-    {
-        $manifest['assets'] = $this->config->get('theme.asset', []);
-        $manifest['path'] = [
-            'resources' => $this->basePath,
-            'public' => app('path.public'),
-        ];
-        $DS = DIRECTORY_SEPARATOR;
-        $configPath = $this->getPath(
-            [$this->basePath,'assets','config.json']
-        );
-        $this->files->put(
-            $configPath, json_encode($manifest)
-        );
     }
 
     protected function writeThemeFiles($content, $name, $path)

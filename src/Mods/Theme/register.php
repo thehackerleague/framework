@@ -13,9 +13,6 @@ return [
             'mod_view'
         ],
         'autoload' => [
-            'psr-4' => [
-                'Mods\\Theme\\' => realpath(__DIR__.'/')
-            ]
         ]
     ]
 ];

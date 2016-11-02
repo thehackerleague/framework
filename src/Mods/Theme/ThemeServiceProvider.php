@@ -5,6 +5,7 @@ namespace Mods\Theme;
 use Mods\Support\ServiceProvider;
 use Mods\Theme\Console\ThemeDeployCommand;
 use Mods\Theme\Console\ThemeClearCommand;
+use Mods\Theme\Console\ThemePreProcessCommand;
 
 class ThemeServiceProvider extends ServiceProvider
 {
@@ -62,10 +63,23 @@ class ThemeServiceProvider extends ServiceProvider
         $this->app->singleton('command.theme.clear', function ($app) {
             return new ThemeClearCommand($app['files']);
         });
-        $this->commands(['command.theme.deploy', 'command.theme.clear']);
+        $this->app->singleton('command.theme.preprocessor', function ($app) {
+            return new ThemePreProcessCommand($app['files']);
+        });
+        $this->commands(['command.theme.deploy', 'command.theme.clear', 'command.theme.preprocessor']);
 
         $this->app->singleton('theme.deployer', function ($app) {
             return new Deployer($app['files'], $app['theme.asset.resolver'], $app['config']);
+        });
+
+        $this->app->singleton('theme.preprocessor', function ($app) {
+            return new PreProcess(
+                $app, 
+                $app['files'],
+                $app['Mods\View\Factory'], 
+                $app['theme.resolver'],
+                $app['config']
+            );
         });
     }
 

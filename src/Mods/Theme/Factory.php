@@ -181,8 +181,8 @@ class Factory
         $app['theme.asset.resolver']->addLocation($assetPaths);
     }
 
-    public function getActiveTheme($type)
+    public function getActiveTheme($area)
     {
-        return $this->themeResolver->getActive($type);
+        return $this->themeResolver->getActive($area);
     }
 }
