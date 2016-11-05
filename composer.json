@@ -21,7 +21,7 @@
     },
     "autoload": {
         "files": [
-            "src/Mods/View/helpers.php",
+            "src/Mods/View/helpers.php"
         ],
         "psr-4": {
             "Mods\\": "src/Mods/"
