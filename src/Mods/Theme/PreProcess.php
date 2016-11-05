@@ -172,10 +172,6 @@ class PreProcess
     protected function writeConfig($manifest)
     {
         $manifest['assets'] = $this->config->get('theme.asset', []);
-        $manifest['path'] = [
-            'resources' => $this->basePath,
-            'public' => $this->application['path.public'],
-        ];
         $configPath = $this->getPath(
             [$this->basePath, 'assets', 'config.json']
         );
