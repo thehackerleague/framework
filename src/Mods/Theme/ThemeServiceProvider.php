@@ -3,9 +3,10 @@
 namespace Mods\Theme;
 
 use Mods\Support\ServiceProvider;
-use Mods\Theme\Console\ThemeDeployCommand;
-use Mods\Theme\Console\ThemeClearCommand;
-use Mods\Theme\Console\ThemePreProcessCommand;
+use Mods\Theme\Console\Command;
+use Mods\Theme\Console\Deployer;
+use Mods\Theme\Console\PreProcess;
+use Mods\Theme\Console\Complier;
 
 class ThemeServiceProvider extends ServiceProvider
 {
@@ -58,18 +59,38 @@ class ThemeServiceProvider extends ServiceProvider
     protected function registerThemeDeployer()
     {
         $this->app->singleton('command.theme.deploy', function ($app) {
-            return new ThemeDeployCommand($app['files']);
+            return new Command\Deploy($app['files']);
         });
         $this->app->singleton('command.theme.clear', function ($app) {
-            return new ThemeClearCommand($app['files']);
+            return new Command\Clear($app['files']);
         });
         $this->app->singleton('command.theme.preprocessor', function ($app) {
-            return new ThemePreProcessCommand($app['files']);
+            return new Command\PreProcess($app['files']);
         });
-        $this->commands(['command.theme.deploy', 'command.theme.clear', 'command.theme.preprocessor']);
+        $this->app->singleton('command.theme.compile', function ($app) {
+            return new Command\Compile();
+        });
+        $this->commands([
+            'command.theme.deploy', 'command.theme.clear', 
+            'command.theme.preprocessor', 'command.theme.compile'
+        ]);
 
         $this->app->singleton('theme.deployer', function ($app) {
-            return new Deployer($app['files'], $app['theme.asset.resolver'], $app['config']);
+            return new Deployer(
+                $app['files'], 
+                $app['theme.asset.resolver'], 
+                $app['config'],
+                $app['path.resources']
+            );
+        });
+
+        $this->app->singleton('theme.complier', function ($app) {
+            return new Complier(
+                $app['files'], 
+                $app['config'],
+                $app['path.resources'],
+                $app['path.public']
+            );
         });
 
         $this->app->singleton('theme.preprocessor', function ($app) {
@@ -91,7 +112,10 @@ class ThemeServiceProvider extends ServiceProvider
     public function provides()
     {
         if (!$this->app->environment('production')) {
-            return ['command.theme.deploy', 'command.theme.clear'];
+            return [
+                'command.theme.deploy', 'command.theme.clear', 
+                'command.theme.preprocessor', 'command.theme.compile'
+            ];
         }
     }
 }

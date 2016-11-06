@@ -1,21 +1,21 @@
 <?php
 
-namespace Mods\Theme\Console;
+namespace Mods\Theme\Console\Command;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class ThemeDeployCommand extends Command
+class Clear extends Command
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $signature = 'theme:deploy
-        {--area= : The area to be deploy.}
-    	{--theme= : The theme to be deploy.}
-    	{--module= : The module to be deploy for the theme or area.}
+    protected $signature = 'theme:clear
+        {--area= : The area to be clear.}
+    	{--theme= : The theme to be clear.}
+    	{--module= : The module to be clear for the theme or area.}
     ';
 
     /**
@@ -23,7 +23,7 @@ class ThemeDeployCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Deploy the asset.';
+    protected $description = 'Clear the asset.';
 
     /**
      * The filesystem instance.
@@ -66,14 +66,7 @@ class ThemeDeployCommand extends Command
             $module = $this->option('module');
         }
 
-        $deployer = $app['theme.deployer']->setConsole($this);
-
-        $deployer->clear($area, $theme, $module);
-
-        $deployer->deploy($area, $theme, $module);
-
-        $this->info("\n");
-        $this->info("Deployed successfully!");
+        $app['theme.deployer']->setConsole($this)->clear($area, $theme, $module);
     }
 
     /**

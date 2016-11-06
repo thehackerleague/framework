@@ -1,6 +1,6 @@
 <?php
 
-namespace  Mods\Theme;
+namespace  Mods\Theme\Console;
 
 use Mods\Theme\ThemeResolver;
 use Mods\View\Factory as ViewFactory;
@@ -11,7 +11,7 @@ use Illuminate\Contracts\Foundation\Application;
 use MJS\TopSort\Implementations\FixedArraySort as SortAssets;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 
-class PreProcess
+class PreProcess extends Console
 {
     /**
      * The view finder implementation.
@@ -48,9 +48,6 @@ class PreProcess
      */
     protected $config;
 
-
-    protected $console;
-
     protected $basePath;
     /**
      * Create a new config cache command instance.
@@ -77,15 +74,10 @@ class PreProcess
         $this->basePath = $this->application['path.resources'];
     }
 
-    public function setConsole($console)
-    {
-        $this->console = $console;
-        return $this;
-    }
-
     public function process($area = null, $theme = null, $module = null)
     {
         $manifest = [];
+        $assets = $this->config->get('theme.asset', []);
 
         if ($area) {
             $areas = [$area];
@@ -96,13 +88,12 @@ class PreProcess
         $oldArea = $this->application['area'];
         $oldLayoutXmlLocation = $this->config->get('layout.xml_location');
 
-        $page = $this->viewFactory->getLayoutFactory();
+        $page = $this->viewFactory->getPageFactory();
         $pageUpdates = $page->getLayout()->getUpdate();
-
-        $handles = $pageUpdates->collectHandlesFromUpdates();
         foreach ($areas as $area) {
             $manifest[$area] = [];
             $this->application['area'] = $area;
+            $handles = $pageUpdates->collectHandlesFromUpdates();
             $currentTheme = $this->themeResolver->getActive($area);
             $themes = $this->themeResolver->themeCollection($area);
             foreach ($themes as $key => $theme) {
@@ -126,7 +117,7 @@ class PreProcess
             }
         }
 
-        $this->writeConfig(['areas' => $manifest]);
+        $this->writeConfig(['assets' => $assets, 'areas' => $manifest]);
 
         $this->application['area'] = $oldArea;
         $this->config->set('layout.xml_location', $oldLayoutXmlLocation);
@@ -151,37 +142,57 @@ class PreProcess
 
     protected function prepareAsset($assets, $handle, $manifest)
     {
-        $scripts = $assets['js'];
+        $scripts = $this->prepareScripts($assets['js']);
+        $styles = $this->prepareStyles($assets['css']);
+
+        return array_merge_recursive($manifest, [
+            'js' => [$handle => $scripts],
+            'css' => [$handle => $styles]
+        ]);
+    }
+
+    protected function prepareScripts($scripts)
+    {
         $scripts =  '<?xml version="1.0"?>'
             . '<scripts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
             . $scripts
             . '</scripts>';
         $xml = simplexml_load_string($scripts);
-        $assetSorter =  new SortAssets();
+        $jsSorter =  new SortAssets();
         foreach ($xml->script as $script) {
             $attributes = $script->attributes();
-            $assetSorter->add(
+            $jsSorter->add(
                 (string) $attributes->src,
                 ($attributes->depends)?(string) $attributes->depends:null
             );
         }
 
-        return array_merge_recursive($manifest, ['js' => [$handle =>$assetSorter->sort()]]);
+        return $jsSorter->sort();
+    }
+
+    protected function prepareStyles($styles)
+    {
+        $styles =  '<?xml version="1.0"?>'
+            . '<styles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+            . $styles
+            . '</styles>';
+        $xml = simplexml_load_string($styles);
+        $css = [];
+        foreach ($xml->link as $style) {
+            $attributes = $style->attributes();
+            $css[] = (string) $attributes->href;
+        }
+
+        return $css;
     }
 
     protected function writeConfig($manifest)
     {
-        $manifest['assets'] = $this->config->get('theme.asset', []);
         $configPath = $this->getPath(
             [$this->basePath, 'assets', 'config.json']
         );
         $this->files->put(
             $configPath, json_encode($manifest, JSON_PRETTY_PRINT)
         );
-    }
-    
-    protected function getPath($paths)
-    {
-        return implode(DIRECTORY_SEPARATOR, $paths);
     }
 }

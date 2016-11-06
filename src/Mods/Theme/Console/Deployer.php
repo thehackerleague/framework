@@ -1,12 +1,13 @@
 <?php
 
-namespace  Mods\Theme;
+namespace  Mods\Theme\Console;
 
+use Mods\Theme\AssetResolver;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 
-class Deployer
+class Deployer extends Console
 {
     /**
      * The filesystem instance.
@@ -29,9 +30,11 @@ class Deployer
      */
     protected $config;
 
-
-    protected $console;
-
+    /**
+     * Resource location
+     *
+     * @var string
+     */
     protected $basePath;
 
     /**
@@ -40,23 +43,19 @@ class Deployer
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Mods\Theme\AssetResolver $assetResolver
      * @param  \Illuminate\Contracts\Config\Repository  $config
+     * @param  string $basePath
      * @return void
      */
     public function __construct(
         Filesystem $files,
         AssetResolver $assetResolver,
-        ConfigContract $config
+        ConfigContract $config,
+        $basePath
     ) {
         $this->files = $files;
         $this->config = $config;
         $this->assetResolver = $assetResolver;
-        $this->basePath = app('path.resources');
-    }
-
-    public function setConsole($console)
-    {
-        $this->console = $console;
-        return $this;
+        $this->basePath = $basePath;
     }
 
     public function deploy($area = null, $theme = null, $module = null)
@@ -67,12 +66,11 @@ class Deployer
             $areas = array_merge(['frontend'], array_values($this->config->get('app.areas', [])));
         }
         foreach ($areas as $area) {
-            $this->info("\n");
+            $this->info("\n");   
             $this->line("Deloying asset for {$area} section");
             $areaHints = $this->assetResolver->getHints($area, $module);
             $areaPaths = $this->assetResolver->getPaths($area, $theme);
             foreach ($areaPaths as $themekey => $locations) {
-                $this->info("\n");
                 $this->line("Deloying asset for {$themekey} theme in {$area} section");
                 foreach ($areaHints as $namespace => $location) {
                     $this->moveHintAsset($namespace, $location, $area, $themekey);
@@ -87,7 +85,6 @@ class Deployer
                 }
             }
 
-            $this->info("\n");
             $this->line("Deloyed asset for {$area} section");
 
             $this->combineModuleAssests($area, $areaPaths);
@@ -161,7 +158,6 @@ class Deployer
 
     protected function moveHintAsset($namespace, $location, $area, $theme)
     {
-        $this->info("\n");
         $this->line("Deploying files from `{$namespace}` module.");
         $assetType = $this->config->get('theme.asset', []);
         $resourcePath = 'assets';
@@ -192,7 +188,6 @@ class Deployer
 
     protected function movePathAsset($location, $area, $theme)
     {
-        $this->info("\n");
         $this->line("Deploying files from `{$location}` location.");
         $assetType = $this->config->get('theme.asset', []);
         $resourcePath = 'assets';
@@ -226,31 +221,5 @@ class Deployer
         $this->files->put(
             $path.'/'.$name, implode(PHP_EOL, $content)
         );
-    }
-
-    protected function getPath($paths)
-    {
-        return implode(DIRECTORY_SEPARATOR, $paths);
-    }
-
-    protected function info($msg)
-    {
-        if ($this->console) {
-            $this->console->info($msg);
-        }
-    }
-
-    protected function warn($msg)
-    {
-        if ($this->console) {
-            $this->console->warn($msg);
-        }
-    }
-
-    protected function line($msg)
-    {
-        if ($this->console) {
-            $this->console->line($msg);
-        }
     }
 }

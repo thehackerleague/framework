@@ -1,21 +1,21 @@
 <?php
 
-namespace Mods\Theme\Console;
+namespace Mods\Theme\Console\Command;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class ThemePreProcessCommand extends Command
+class Compile extends Command
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $signature = 'theme:pre
-        {--area= : The area to be clear.}
-    	{--theme= : The theme to be clear.}
-    	{--module= : The module to be clear for the theme or area.}
+    protected $signature = 'theme:compile
+        {--area= : The area to be compile.}
+    	{--theme= : The theme to be compile.}
+    	{--module= : The module to be compile for the theme or area.}
     ';
 
     /**
@@ -23,27 +23,7 @@ class ThemePreProcessCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Pre Process the assets.';
-
-    /**
-     * The filesystem instance.
-     *
-     * @var \Illuminate\Filesystem\Filesystem
-     */
-    protected $files;
-
-    /**
-     * Create a new config cache command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
-     */
-    public function __construct(Filesystem $files)
-    {
-        parent::__construct();
-
-        $this->files = $files;
-    }
+    protected $description = 'Compile the Theme & Module asset and ship it.';
 
     /**
      * Execute the console command.
@@ -66,7 +46,17 @@ class ThemePreProcessCommand extends Command
             $module = $this->option('module');
         }
 
-        $app['theme.preprocessor']->setConsole($this)->process($area, $theme, $module);
+        $deployer = $app['theme.deployer']->setConsole($this);
+        $complier = $app['theme.complier']->setConsole($this);
+        $preprocessor = $app['theme.preprocessor']->setConsole($this);
+
+        $deployer->clear($area, $theme, $module);
+
+        $deployer->deploy($area, $theme, $module);
+
+        $preprocessor->process($area, $theme, $module);        
+
+        $complier->compile($area, $theme, $module); 
     }
 
     /**
