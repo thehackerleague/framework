@@ -119,9 +119,6 @@ class Factory
                 if (is_dir($appPath = $path.'/templates/'.$namespace)) {
                     $this->view->addNamespace($areaNamespace, $appPath);
                 }
-                if (is_dir($appPath = $path.'/layouts/')) {
-                    static::$layoutXmlLocation[$area][md5($appPath)] = $appPath;
-                }
             }
             foreach ((array) $hints as $path) {
                 if (is_dir($appPath = $path.'/'.$area.'/templates/')) {
@@ -145,6 +142,16 @@ class Factory
 
     protected function registerLayoutXml($app)
     {
+        $areas = array_merge(['frontend'], array_values($app['config']->get('app.areas', [])));
+        foreach ($areas as $area) {
+            $paths = $this->themeResolver->getPaths($area)->toArray();
+            foreach ($paths as $path) {
+                if (is_dir($appPath = $path.'/layouts/')) {
+                    static::$layoutXmlLocation[$area][md5($appPath)] = $appPath;
+                }
+            }
+        }
+
         $oldXmlLocations = $app['config']->get('layout.xml_location', []);
         $xmlLocations = array_merge_recursive($oldXmlLocations, static::$layoutXmlLocation);
         $app['config']->set('layout.xml_location', $xmlLocations);
