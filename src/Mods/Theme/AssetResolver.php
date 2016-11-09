@@ -184,8 +184,12 @@ class AssetResolver
     public function getPaths($area = null, $theme = null)
     {
         if($area && isset($this->paths[$area])) {
-            if($theme && isset($this->paths[$area][$theme])) {
-                return [$theme => $this->paths[$area][$theme]];
+            if($theme) {
+                if(isset($this->paths[$area][$theme])) {
+                    return [$theme => $this->paths[$area][$theme]];
+                } else {
+                    return [];
+                }
             }
             return $this->paths[$area];
         }
@@ -200,8 +204,12 @@ class AssetResolver
     public function getHints($area = null, $namespace = null)
     {
         if($area && isset($this->hints[$area])) {
-            if($namespace && isset($this->hints[$area][$namespace])) {
-                return [$namespace => $this->hints[$area][$namespace]];
+            if($namespace) {
+                if(isset($this->hints[$area][$namespace])) {
+                    return [$namespace => $this->hints[$area][$namespace]];
+                } else {
+                    return [];
+                }
             }
             return $this->hints[$area];
         }

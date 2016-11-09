@@ -99,42 +99,30 @@ class Deployer extends Console
             $areas = array_merge(['frontend'], array_values($this->config->get('app.areas', [])));
         }
         foreach ($areas as $area) {
-            $this->line("Clearing asset for {$area} section");
 
             if (!$theme && !$module) {
-                $assetType = $this->config->get('theme.asset', []);
-                foreach ($assetType as $type => $resourcePath) {
-                    $this->files->cleanDirectory($this->getPath([$this->basePath,$resourcePath,$area]));
-                }
+                $this->info("Clearing asset for {$area} section.");
+                $this->files->cleanDirectory(
+                    $this->getPath([
+                        $this->basePath, 'assets', $area
+                    ])
+                );
                 continue;
             }
 
             $areaHints = $this->assetResolver->getHints($area, $module);
             $areaPaths = $this->assetResolver->getPaths($area, $theme);
+
             foreach ($areaPaths as $themekey => $locations) {
                 if (!$module && $theme) {
-                    $this->line("Clearing asset for {$themekey} theme.");
-                    foreach ($locations as $location) {
-                        $this->clearPathAsset($location, $area, $themekey);
-                    }
+                    $this->clearPathAsset($area, $themekey);
                     continue;
                 }
 
-                $this->line("Clearing asset for {$themekey} theme in {$area} section");
                 foreach ($areaHints as $namespace => $location) {
-                    $this->clearHintAsset($namespace, $location, $area, $themekey);
-                }
-
-                if ($module && !$theme) {
-                    continue;
-                }
-
-                foreach ($locations as $location) {
-                    $this->clearPathAsset($location, $area, $themekey);
+                    $this->clearHintAsset($namespace, $area, $themekey);
                 }
             }
-
-            $this->line("Cleared asset for {$area} section");
         }
     }
 
@@ -173,15 +161,14 @@ class Deployer extends Console
         }
     }
 
-    protected function clearHintAsset($namespace, $location, $area, $theme)
+    protected function clearHintAsset($namespace, $area, $theme)
     {
-        $this->line("Clearing files from `{$namespace}` module.");
+        $this->info("Clearing files from `{$area}` ==> `{$theme}` ==> `{$namespace}`  module.");
         $assetType = $this->config->get('theme.asset', []);
-        $resourcePath = 'assets';
         foreach ($assetType as $type) {
             $this->info("Cleaing `{$type}`.");
             $this->files->cleanDirectory($this->getPath([
-                $this->basePath,$resourcePath,$area,$theme,$type,$namespace
+                $this->basePath, 'assets', $area, $theme, $type, $namespace
             ]));
         }
     }
@@ -203,17 +190,12 @@ class Deployer extends Console
         }
     }
 
-    protected function cleanPathAsset($location, $area, $theme)
+    protected function clearPathAsset($area, $theme)
     {
-        $this->line("Clearing files from `{$location}` location.");
-        $assetType = $this->config->get('theme.asset', []);
-        $resourcePath = 'assets';
-        foreach ($assetType as $type) {
-            $this->info("Cleaing `{$type}`.");
-            $this->files->cleanDirectory($this->getPath([
-                $this->basePath,$resourcePath,$area,$theme,$type
-            ]));
-        }
+        $this->info("Clearing files from `{$area}` ==> `{$theme}` location.");
+        $this->files->cleanDirectory($this->getPath([
+            $this->basePath, 'assets', $area, $theme
+        ]));
     }
 
     protected function writeThemeFiles($content, $name, $path)
