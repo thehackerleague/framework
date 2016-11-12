@@ -58,15 +58,10 @@ class Deployer extends Console
         $this->basePath = $basePath;
     }
 
-    public function deploy($area = null, $theme = null, $module = null)
+    public function deploy($areas, $theme = null, $module = null)
     {
-        if ($area) {
-            $areas = [$area];
-        } else {
-            $areas = array_merge(['frontend'], array_values($this->config->get('app.areas', [])));
-        }
         foreach ($areas as $area) {
-            $this->info("\n");   
+            $this->info("\n");
             $this->line("Deloying asset for {$area} section");
             $areaHints = $this->assetResolver->getHints($area, $module);
             $areaPaths = $this->assetResolver->getPaths($area, $theme);
@@ -91,15 +86,9 @@ class Deployer extends Console
         }
     }
 
-    public function clear($area = null, $theme = null, $module = null)
+    public function clear($areas, $theme = null, $module = null)
     {
-        if ($area) {
-            $areas = [$area];
-        } else {
-            $areas = array_merge(['frontend'], array_values($this->config->get('app.areas', [])));
-        }
         foreach ($areas as $area) {
-
             if (!$theme && !$module) {
                 $this->info("Clearing asset for {$area} section.");
                 $this->files->cleanDirectory(
@@ -129,11 +118,11 @@ class Deployer extends Console
     protected function combineModuleAssests($area, $areaPaths)
     {
         foreach ($areaPaths as $themekey => $locations) {
-            foreach (['sass' => 'scss','less' => 'less'] as $lang => $ext) {
-               $themePath = $this->getPath(
+            foreach (['sass' => 'scss', 'less' => 'less'] as $lang => $ext) {
+                $themePath = $this->getPath(
                     [$this->basePath, 'assets', $area, $themekey, $lang]
                 );
-               if($this->files->exists($themePath)) {
+                if ($this->files->exists($themePath)) {
                     $import = [];
                     foreach (Finder::create()->files()->name('_module.'.$ext)->in([$themePath]) as $file) {
                         $import[] = "@import '{$file->getRelativePathName()}' ";
@@ -151,8 +140,8 @@ class Deployer extends Console
         $resourcePath = 'assets';
         foreach ($assetType as $type) {
             if ($this->files->copyDirectory(
-                $this->getPath([$location,$type]),
-                $this->getPath([$this->basePath,$resourcePath,$area,$theme,$type,$namespace])
+                $this->getPath([$location, $type]),
+                $this->getPath([$this->basePath, $resourcePath, $area, $theme, $type, $namespace])
             )) {
                 $this->info("Moving `{$type}`.");
             } else {
@@ -180,8 +169,8 @@ class Deployer extends Console
         $resourcePath = 'assets';
         foreach ($assetType as $type) {
             if ($this->files->copyDirectory(
-                $this->getPath([$location,$type]),
-                $this->getPath([$this->basePath,$resourcePath,$area,$theme,$type])
+                $this->getPath([$location, $type]),
+                $this->getPath([$this->basePath, $resourcePath, $area, $theme, $type])
             )) {
                 $this->info("Moving `{$type}`.");
             } else {

@@ -182,7 +182,7 @@ class Factory
                     if (is_dir($appPath = $path.'/assets/')) {
                         $assetPaths[$area][$key][] = $appPath;
                     }
-                } 
+                }
             }
         }
         $app['theme.asset.resolver']->addLocation($assetPaths);

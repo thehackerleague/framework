@@ -76,7 +76,7 @@ class ThemeResolver
         );
         $themeCollection = Collection::make($themes);
         return $themeCollection;
-    } 
+    }
 
     public function getTheme($key, $area)
     {

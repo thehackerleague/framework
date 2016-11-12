@@ -54,19 +54,25 @@ class PreProcess extends Command
     {
         $app = $this->getFreshAsset();
         $area = null;
-        if($this->hasOption('area')) {
+        if ($this->hasOption('area')) {
             $area = $this->option('area');
         }
         $theme = null;
-        if($this->hasOption('theme')) {
+        if ($this->hasOption('theme')) {
             $theme = $this->option('theme');
         }
         $module = null;
-        if($this->hasOption('module')) {
+        if ($this->hasOption('module')) {
             $module = $this->option('module');
         }
 
-        $app['theme.preprocessor']->setConsole($this)->process($area, $theme, $module);
+        if ($area) {
+            $areas = [$area];
+        } else {
+            $areas = array_merge(['frontend'], array_values($app['config']->get('app.areas', [])));
+        }
+
+        $app['theme.preprocessor']->setConsole($this)->process($areas, $theme, $module);
     }
 
     /**

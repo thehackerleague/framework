@@ -7,6 +7,7 @@ use Mods\Theme\Console\Command;
 use Mods\Theme\Console\Deployer;
 use Mods\Theme\Console\PreProcess;
 use Mods\Theme\Console\Complier;
+use Mods\Theme\Compiler\Factory as ComplierFactory;
 
 class ThemeServiceProvider extends ServiceProvider
 {
@@ -71,33 +72,39 @@ class ThemeServiceProvider extends ServiceProvider
             return new Command\Compile();
         });
         $this->commands([
-            'command.theme.deploy', 'command.theme.clear', 
+            'command.theme.deploy', 'command.theme.clear',
             'command.theme.preprocessor', 'command.theme.compile'
         ]);
 
         $this->app->singleton('theme.deployer', function ($app) {
             return new Deployer(
-                $app['files'], 
-                $app['theme.asset.resolver'], 
+                $app['files'],
+                $app['theme.asset.resolver'],
                 $app['config'],
                 $app['path.resources']
             );
         });
 
+        $this->app->singleton('theme.asset.complier', function ($app) {
+            return new ComplierFactory(
+                $app['Illuminate\Pipeline\Pipeline'],
+                $app['config']->get('theme.compliers', [])
+            );
+        });
+
         $this->app->singleton('theme.complier', function ($app) {
             return new Complier(
-                $app['files'], 
-                $app['config'],
-                $app['path.resources'],
-                $app['path.public']
+                $app['files'],
+                $app['theme.asset.complier'],
+                $app['path.resources']
             );
         });
 
         $this->app->singleton('theme.preprocessor', function ($app) {
             return new PreProcess(
-                $app, 
+                $app,
                 $app['files'],
-                $app['Mods\View\Factory'], 
+                $app['Mods\View\Factory'],
                 $app['theme.resolver'],
                 $app['config']
             );
@@ -113,7 +120,7 @@ class ThemeServiceProvider extends ServiceProvider
     {
         if (!$this->app->environment('production')) {
             return [
-                'command.theme.deploy', 'command.theme.clear', 
+                'command.theme.deploy', 'command.theme.clear',
                 'command.theme.preprocessor', 'command.theme.compile'
             ];
         }

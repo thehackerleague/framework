@@ -15,7 +15,9 @@
         }
     ],
     "require": {
-        "mods/view":"*"
+        "mods/view":"*",
+        "tubalmartin/cssmin": "^2.4",
+        "tedivm/jshrink": "^1.1"
     },
     "autoload": {
         "psr-4": {

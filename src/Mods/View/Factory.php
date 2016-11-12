@@ -64,9 +64,9 @@ class Factory
 
     /**
      * Get the base url for script
-     * 
+     *
      * @return string
-     */ 
+     */
     public function getJsBaseUrl()
     {
         $area = app()->area();
@@ -76,9 +76,9 @@ class Factory
 
     /**
      * Get the base url for style
-     * 
+     *
      * @return string
-     */ 
+     */
     public function getCssBaseUrl()
     {
         $area = app()->area();

@@ -6,7 +6,7 @@ abstract class Console
 {
     protected $console;
     
-	public function setConsole($console)
+    public function setConsole($console)
     {
         $this->console = $console;
         return $this;

@@ -74,16 +74,10 @@ class PreProcess extends Console
         $this->basePath = $this->application['path.resources'];
     }
 
-    public function process($area = null, $theme = null, $module = null)
+    public function process($areas, $theme = null, $module = null)
     {
         $manifest = [];
         $assets = $this->config->get('theme.asset', []);
-
-        if ($area) {
-            $areas = [$area];
-        } else {
-            $areas = array_merge(['frontend'], array_values($this->config->get('app.areas', [])));
-        }
         
         $oldArea = $this->application['area'];
         $oldLayoutXmlLocation = $this->config->get('layout.xml_location');

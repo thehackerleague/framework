@@ -4,7 +4,7 @@ namespace  Mods\Theme\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Illuminate\Contracts\Config\Repository as ConfigContract;
+use Mods\Theme\Compiler\Factory;
 
 class Complier extends Console
 {
@@ -16,11 +16,11 @@ class Complier extends Console
     protected $files;
 
     /**
-     * The config instance.
+     * The compiler instance.
      *
-     * @var \Illuminate\Contracts\Config\Repository
+     * @var \Mods\Theme\Compiler\Factory
      */
-    protected $config;
+    protected $compiler;
 
     /**
      * Resource location
@@ -30,60 +30,30 @@ class Complier extends Console
     protected $basePath;
 
     /**
-     * public location
-     *
-     * @var string
-     */
-    protected $publicPath;
-
-    /**
-     * Create a new config cache command instance.
+     * Create a new compiler command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  \Illuminate\Contracts\Config\Repository  $config
+     * @param  \Mods\Theme\Compiler\Factory  $compiler
      * @param  string $basePath
-     * @param  string $publicPath
      * @return void
      */
     public function __construct(
         Filesystem $files,
-        ConfigContract $config,
-        $basePath,
-        $publicPath
+        Factory $compiler,
+        $basePath
     ) {
         $this->files = $files;
-        $this->config = $config;
+        $this->compiler = $compiler;
         $this->basePath = $basePath;
-        $this->publicPath = $publicPath;
     }
 
-    public function compile($area = null, $theme = null, $module = null)
+    public function compile($areas, $theme = null, $module = null)
     {
-        if ($area) {
-            $areas = [$area];
-        } else {
-            $areas = array_merge(['frontend'], array_values($this->config->get('app.areas', [])));
-        }
-
         $metadata = json_decode($this->readConfig(), true);
 
         foreach ($metadata['areas'] as $area => $themes) {
             foreach ($themes as $theme => $assets) {
-                $this->moveAssetToPublic($area, $theme, $assets);
-            }
-        }
-    }
-
-    public function moveAssetToPublic($area, $theme, $assets)
-    {
-        foreach ($assets as $type => $contents) {
-            if ($this->files->copyDirectory(
-                $this->getPath([$this->basePath, 'assets', $area, $theme, $type]),
-                $this->getPath([$this->publicPath, 'assets', $area, $theme, $type])
-            )) {
-                $this->info("Publishing `{$type}` in {$area} ==> {$theme}.");
-            } else {
-                $this->warn("`{$type}` files not found in {$area} ==> {$theme}.");
+                $this->compiler->handle($area, $theme, $assets, $this->console);
             }
         }
     }

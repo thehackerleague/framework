@@ -54,23 +54,29 @@ class Deploy extends Command
     {
         $app = $this->getFreshAsset();
         $area = null;
-        if($this->hasOption('area')) {
+        if ($this->hasOption('area')) {
             $area = $this->option('area');
         }
         $theme = null;
-        if($this->hasOption('theme')) {
+        if ($this->hasOption('theme')) {
             $theme = $this->option('theme');
         }
         $module = null;
-        if($this->hasOption('module')) {
+        if ($this->hasOption('module')) {
             $module = $this->option('module');
         }
 
+        if ($area) {
+            $areas = [$area];
+        } else {
+            $areas = array_merge(['frontend'], array_values($app['config']->get('app.areas', [])));
+        }
+        
         $deployer = $app['theme.deployer']->setConsole($this);
 
-        $deployer->clear($area, $theme, $module);
+        $deployer->clear($areas, $theme, $module);
 
-        $deployer->deploy($area, $theme, $module);
+        $deployer->deploy($areas, $theme, $module);
 
         $this->info("\n");
         $this->info("Deployed successfully!");

@@ -79,7 +79,7 @@ class ModuleRepository
         foreach ($manifest['themes'] as $area => $themes) {
             $config->set('theme.'.$area.'.themes',
                 collect($themes)->map(function ($item, $key) {
-                        return new Theme($item);
+                    return new Theme($item);
                 })->toArray()
             );
         }
@@ -121,11 +121,11 @@ class ModuleRepository
             echo($e->getMessage());
             exit(0);
         }
-        $notFoundModule = array_diff($activeModules, $manifest['relsoved']);        
-        if(count($notFoundModule)) {
+        $notFoundModule = array_diff($activeModules, $manifest['relsoved']);
+        if (count($notFoundModule)) {
             $word = (count($notFoundModule) > 1)?'Modules':'Module';
             echo(implode(', ', $notFoundModule). " $word not Found");
-            exit(0); 
+            exit(0);
         }
 
         foreach ($manifest['relsoved'] as $code) {
