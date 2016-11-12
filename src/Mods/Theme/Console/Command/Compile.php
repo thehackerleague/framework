@@ -14,7 +14,8 @@ class Compile extends Command
      */
     protected $signature = 'theme:compile
         {--m|minify : Minify the assets.}
-        {--c|combine : Combine the assets.}
+        {--b|bundle : Bundle the assets.}
+        {--only : Run only compilation.}
         {--area= : The area to be compile.}
     	{--theme= : The theme to be compile.}
     	{--module= : The module to be compile for the theme or area.}
@@ -58,11 +59,13 @@ class Compile extends Command
         $complier = $app['theme.complier']->setConsole($this);
         $preprocessor = $app['theme.preprocessor']->setConsole($this);
 
-        $deployer->clear($areas, $theme, $module);
+        if (!$this->option('only')) {
+            $deployer->clear($areas, $theme, $module);
 
-        $deployer->deploy($areas, $theme, $module);
+            $deployer->deploy($areas, $theme, $module);
 
-        $preprocessor->process($areas, $theme, $module);
+            $preprocessor->process($areas, $theme, $module);
+        }
 
         $complier->compile($areas, $theme, $module);
     }

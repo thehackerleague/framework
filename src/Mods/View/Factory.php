@@ -8,7 +8,7 @@ use Mods\Theme\Factory as ThemeFactory;
 class Factory
 {
     /**
-     * @var \Layout\Core\Factory $pageFactory
+     * @var \Layout\Core\PageFactory $pageFactory
      */
     protected $pageFactory;
 
@@ -19,7 +19,7 @@ class Factory
 
     /**
      *
-     * @param  \Layout\Core\Factory  $pageFactory
+     * @param  \Layout\Core\PageFactory  $pageFactory
      * @param  \Mods\Theme\Factory $themeFactory
      */
     public function __construct(PageFactory $pageFactory, ThemeFactory $themeFactory)
@@ -57,32 +57,77 @@ class Factory
      */
     protected function updateAssetUrls($head)
     {
-        $head['js'] = str_replace('%baseurl', $this->getJsBaseUrl(), $head['js']);
-        $head['css'] = str_replace('%baseurl', $this->getCssBaseUrl(), $head['css']);
+        $area = app()->area();
+        $theme = $this->themeFactory->getActiveTheme($area);
+        $manifest = $this->fetchManifest($area, $theme);
+        $routeHandler = $this->pageFactory->routeHandler();
+
+        if (isset($manifest['bundled']) && $manifest['bundled']) {
+            $head['js'] = '<script src="'.
+                $this->getJsBaseUrl($area, $theme).'bundle/'.$routeHandler.
+            '.js"></script>';
+            $head['css'] = '<link href="'.
+                $this->getCssBaseUrl($area, $theme).'bundle/'.$routeHandler.
+            '.css" media="all" rel="stylesheet" />';
+        } else {
+            $minified = (isset($manifest['minified']) && $manifest['minified']);
+            $minified = ($minified)?'min/':'';
+            $head['js'] = str_replace(
+                '%baseurl', $this->getJsBaseUrl($area, $theme).$minified,
+                $head['js']
+            );
+            $head['css'] = str_replace(
+                '%baseurl', $this->getCssBaseUrl($area, $theme).$minified,
+                 $head['css']
+            );
+        }
         return $head;
     }
 
     /**
      * Get the base url for script
      *
+     * @param string $area
+     * @param string $theme
      * @return string
      */
-    public function getJsBaseUrl()
+    public function getJsBaseUrl($area, $theme)
     {
-        $area = app()->area();
-        $theme = $this->themeFactory->getActiveTheme($area);
         return asset("assets/{$area}/{$theme}/js").'/';
     }
 
     /**
      * Get the base url for style
      *
+     * @param string $area
+     * @param string $theme
      * @return string
      */
-    public function getCssBaseUrl()
+    public function getCssBaseUrl($area, $theme)
     {
-        $area = app()->area();
-        $theme = $this->themeFactory->getActiveTheme($area);
         return asset("assets/{$area}/{$theme}/css").'/';
+    }
+
+    /**
+     * Get the base url for style
+     *
+     * @param string $area
+     * @param string $theme
+     * @return array
+     */
+    protected function fetchManifest($area, $theme)
+    {
+        $manifestPath = $this->getPath(
+            [app('path.resources'), 'assets', $area, $theme, 'manifest.json']
+        );
+        if (!file_exists($manifestPath)) {
+            return [];
+        }
+        return json_decode(file_get_contents($manifestPath), true);
+    }
+
+    protected function getPath($paths)
+    {
+        return implode(DIRECTORY_SEPARATOR, $paths);
     }
 }

@@ -5,6 +5,7 @@ namespace  Mods\Theme\Console;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Mods\Theme\Compiler\Factory;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class Complier extends Console
 {
@@ -50,11 +51,19 @@ class Complier extends Console
     public function compile($areas, $theme = null, $module = null)
     {
         $metadata = json_decode($this->readConfig(), true);
-
-        foreach ($metadata['areas'] as $area => $themes) {
-            foreach ($themes as $theme => $assets) {
-                $this->compiler->handle($area, $theme, $assets, $this->console);
+        $areas = array_intersect_key($metadata['areas'], array_flip($areas));
+        try {
+            foreach ($areas as $area => $themes) {
+                if ($theme) {
+                    $themes = array_intersect_key($themes, [$theme => 1]);
+                }
+                foreach ($themes as $key => $assets) {
+                    $manifest = $this->compiler->handle($area, $key, $assets, $this->console);
+                    $this->writeManifest($manifest, $area, $key);
+                }
             }
+        } catch (FileNotFoundException $e) {
+            $this->console->error("Unexpectedly somthing went wrong during deployment.");
         }
     }
 
@@ -64,5 +73,15 @@ class Complier extends Console
             [$this->basePath, 'assets', 'config.json']
         );
         return $this->files->get($configPath);
+    }
+
+    protected function writeManifest($manifest, $area, $theme)
+    {
+        $configPath = $this->getPath(
+            [$this->basePath, 'assets', $area, $theme, 'manifest.json']
+        );
+        $this->files->put(
+            $configPath, json_encode($manifest, JSON_PRETTY_PRINT)
+        );
     }
 }

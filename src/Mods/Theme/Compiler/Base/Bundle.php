@@ -6,7 +6,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class Move
+abstract class Bundle
 {
     /**
      * The filesystem instance.
@@ -46,40 +46,42 @@ abstract class Move
     public function handle($traveler, $pass)
     {
         extract($traveler);
-
-        $base = ['assets', $area, $theme, $this->getType()];
-
-        if ($this->files->copyDirectory(
-            $this->getPath(array_merge([$this->container['path.resources']], $base)),
-            $this->getPath(array_merge([$this->container['path.public']], $base))
-        )) {
-            $console->info("\t* Publishing `{$this->getType()}` in {$area} ==> {$theme}.");
-        } else {
-            $console->warn("`{$this->getType()}` files not found in {$area} ==> {$theme}.");
+        $traveler['manifest']['bundled'] = false;
+        if (!$console->option('bundle')) {
+            return $pass($traveler);
         }
+        $basePaths = [
+            $this->container['path.resources'], 'assets', $area,
+            $theme, $this->getType(), 'bundle'
+        ];
+        $destination = $this->getPath($basePaths);
 
-        /*
+        if (!$this->files->isDirectory($destination)) {
+            $this->files->makeDirectory($destination, 0777, true);
+        }
         foreach ($asset as $handle => $contents) {
-            foreach ($contents as $content) {
-                $base = ['assets', $area, $theme, $this->getType(), str_replace('%baseurl','',$content)];
-                $destination = $this->getPath(array_merge([$this->container['path.public']], $base));
-                $destination = $this->files->dirname($destination);
+            $destination = $this->getPath(array_merge($basePaths, ["$handle.{$this->getType()}"]));
+            $this->files->put($destination, '');
+            foreach ($contents as $key => $content) {
+                $origin = $this->getPath([
+                    $this->container['path.resources'], 'assets', $area,
+                    $theme, $this->getType(),
+                    str_replace('%baseurl', '', $content)
+                ]);
 
-                if(!$this->files->isDirectory($destination)) {
-                    $this->files->makeDirectory($destination, 0777, true);
-                }
-
-                if ($this->files->copy(
-                    $this->getPath(array_merge([$this->container['path.resources']], $base)),
-                    $this->getPath(array_merge([$this->container['path.public']], $base))
+                if ($this->files->append(
+                    $destination,
+                    $this->files->get($origin)
                 )) {
-                    $console->info("Publishing `{$this->getPath($base)}` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
+                    $console->info("\t* Reading `$origin` for `{$handle}` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
                 } else {
                     $console->warn("`{$this->getPath($base)}` file not found in {$area} ==> {$theme}.");
                 }
             }
+            $console->info("\t* Bundling `{$this->getType()}` for `{$handle}` in {$area} ==> {$theme}.");
         }
-        */
+        
+        $traveler['manifest']['bundled'] = true;
         return $pass($traveler);
     }
 

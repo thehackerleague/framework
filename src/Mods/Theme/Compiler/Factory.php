@@ -26,13 +26,19 @@ class Factory
 
     public function handle($area, $theme, $assets, $console)
     {
+        $manifest = [];
         foreach ($assets as $type => $asset) {
-            $traveler = compact('asset', 'console', 'area', 'theme');
-            $this->pipeline->send($traveler)
+            $traveler = compact('manifest', 'asset', 'console', 'area', 'theme');
+            $console->info("Processing compilation for $area => $theme => $type.");
+            $manifest = $this->pipeline->send($traveler)
                 ->through((isset($this->compilers[$type]))?$this->compilers[$type]:[])
                 ->then(function ($traveler) use ($area, $theme, $type) {
                     $traveler['console']->info("Compilation for $area => $theme => $type done.");
+                    $traveler['console']->line("==============================================");
+                    return $traveler['manifest'];
                 });
         }
+
+        return $manifest;
     }
 }

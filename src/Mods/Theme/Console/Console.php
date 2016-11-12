@@ -31,6 +31,13 @@ abstract class Console
         }
     }
 
+    protected function error($msg)
+    {
+        if ($this->console) {
+            $this->console->error($msg);
+        }
+    }
+
     protected function line($msg)
     {
         if ($this->console) {

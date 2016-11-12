@@ -46,7 +46,7 @@ abstract class Minifier
     public function handle($traveler, $pass)
     {
         extract($traveler);
-        
+        $traveler['manifest']['minified'] = false;
         if (!$console->option('minify')) {
             return $pass($traveler);
         }
@@ -83,7 +83,7 @@ abstract class Minifier
                     $minifedContent,
                     true
                 )) {
-                    $console->info("Minifing `{$this->getPath($base)}` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
+                    $console->info("\t* Minifing `{$this->getPath($base)}` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
                 } else {
                     $console->warn("`{$this->getPath($base)}` file not found in {$area} ==> {$theme}.");
                 }
@@ -92,9 +92,10 @@ abstract class Minifier
             }
         }
 
-        $console->info("\tMinification for {$this->getType()} in {$area} ==> {$theme} done.");
+        $console->info("\t* Minification for {$this->getType()} in {$area} ==> {$theme} done.");
 
         $traveler['asset'] = $asset;
+        $traveler['manifest']['minified'] = true;
         return $pass($traveler);
     }
 
