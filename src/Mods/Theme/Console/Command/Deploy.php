@@ -16,6 +16,7 @@ class Deploy extends Command
         {--area= : The area to be deploy.}
     	{--theme= : The theme to be deploy.}
     	{--module= : The module to be deploy for the theme or area.}
+        {--type= : Compile only the given type.}
     ';
 
     /**
@@ -65,6 +66,10 @@ class Deploy extends Command
         if ($this->hasOption('module')) {
             $module = $this->option('module');
         }
+        $type = null;
+        if ($this->hasOption('type')) {
+            $type = $this->option('type');
+        }
 
         if ($area) {
             $areas = [$area];
@@ -75,9 +80,9 @@ class Deploy extends Command
         
         $deployer = $app['theme.deployer']->setConsole($this);
 
-        $deployer->clear($areas, $theme, $module);
+        $deployer->clear($areas, $theme, $module, $type);
 
-        $deployer->deploy($areas, $theme, $module);
+        $deployer->deploy($areas, $theme, $module, $type);
 
         $this->info("\n");
         $this->info("Deployed successfully!");

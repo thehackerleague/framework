@@ -15,7 +15,9 @@ class Compile extends Command
     protected $signature = 'theme:compile
         {--m|minify : Minify the assets.}
         {--b|bundle : Bundle the assets.}
-        {--only : Run only compilation.}
+        {--o|only : Run only compilation.}
+        {--p|skipPreProcess : Skip pre process.}
+        {--type= : Compile only the given type.}
         {--area= : The area to be compile.}
     	{--theme= : The theme to be compile.}
     	{--module= : The module to be compile for the theme or area.}
@@ -48,6 +50,10 @@ class Compile extends Command
         if ($this->hasOption('module')) {
             $module = $this->option('module');
         }
+        $type = null;
+        if ($this->hasOption('type')) {
+            $type = $this->option('type');
+        }
 
         if ($area) {
             $areas = [$area];
@@ -61,14 +67,15 @@ class Compile extends Command
         $preprocessor = $app['theme.preprocessor']->setConsole($this);
 
         if (!$this->option('only')) {
-            $deployer->clear($areas, $theme, $module);
+            $deployer->clear($areas, $theme, $module, $type);
+            $deployer->deploy($areas, $theme, $module, $type);
 
-            $deployer->deploy($areas, $theme, $module);
-
-            $preprocessor->process($areas, $theme, $module);
+            if (!$this->option('skipPreProcess')) {
+                $preprocessor->process($areas, $theme);
+            }
         }
 
-        $complier->compile($areas, $theme, $module);
+        $complier->compile($areas, $theme, $module, $type);
     }
 
     /**

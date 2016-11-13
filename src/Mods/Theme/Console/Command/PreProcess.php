@@ -15,7 +15,6 @@ class PreProcess extends Command
     protected $signature = 'theme:pre-process
         {--area= : The area to be clear.}
     	{--theme= : The theme to be clear.}
-    	{--module= : The module to be clear for the theme or area.}
     ';
 
     /**
@@ -61,10 +60,6 @@ class PreProcess extends Command
         if ($this->hasOption('theme')) {
             $theme = $this->option('theme');
         }
-        $module = null;
-        if ($this->hasOption('module')) {
-            $module = $this->option('module');
-        }
 
         if ($area) {
             $areas = [$area];
@@ -72,7 +67,7 @@ class PreProcess extends Command
             $areas = array_merge(['frontend'], array_values($app['config']->get('app.areas', [])));
         }
         $this->line("==============================================");
-        $app['theme.preprocessor']->setConsole($this)->process($areas, $theme, $module);
+        $app['theme.preprocessor']->setConsole($this)->process($areas, $theme);
     }
 
     /**

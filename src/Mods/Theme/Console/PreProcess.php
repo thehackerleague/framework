@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use MJS\TopSort\ElementNotFoundException;
 use Illuminate\Contracts\Foundation\Application;
+use Symfony\Component\Console\Output\OutputInterface;
 use MJS\TopSort\Implementations\FixedArraySort as SortAssets;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 
@@ -74,7 +75,7 @@ class PreProcess extends Console
         $this->basePath = $this->application['path.resources'];
     }
 
-    public function process($areas, $theme = null, $module = null)
+    public function process($areas, $theme = null)
     {
         $manifest = [];
         $assets = $this->config->get('theme.asset', []);
@@ -85,12 +86,15 @@ class PreProcess extends Console
         $page = $this->viewFactory->getPageFactory();
         $pageUpdates = $page->getLayout()->getUpdate();
         foreach ($areas as $area) {
+            $this->info("Pre Processing for {$area} section.");
             $manifest[$area] = [];
             $this->application['area'] = $area;
             $handles = $pageUpdates->collectHandlesFromUpdates();
             $currentTheme = $this->themeResolver->getActive($area);
             $themes = $this->themeResolver->themeCollection($area);
+            $themes = $themes->only($theme);
             foreach ($themes as $key => $theme) {
+                $this->info("  => Moking app for {$key} theme in {$area} section");
                 $manifest[$area][$key] = [];
                 $this->mockApplicationTheme($area, $key, $currentTheme);
                 $currentTheme = $key;
@@ -98,6 +102,7 @@ class PreProcess extends Console
                     if ($handle == 'default') {
                         continue;
                     }
+                    $this->info("\t* Preparing Asset config for `{$handle}`", OutputInterface::VERBOSITY_DEBUG);
                     $page->resetPage()
                         ->addHandle('default')
                         ->addHandle($handle)
@@ -109,6 +114,8 @@ class PreProcess extends Console
                     );
                 }
             }
+            $this->info("Pre Processing for {$area} section done.");
+            $this->line("==============================================");
         }
 
         $this->writeConfig(['assets' => $assets, 'areas' => $manifest]);

@@ -16,6 +16,7 @@ class Clear extends Command
         {--area= : The area to be clear.}
     	{--theme= : The theme to be clear.}
     	{--module= : The module to be clear for the theme or area.}
+        {--type= : Compile only the given type.}
     ';
 
     /**
@@ -65,6 +66,10 @@ class Clear extends Command
         if ($this->hasOption('module')) {
             $module = $this->option('module');
         }
+        $type = null;
+        if ($this->hasOption('type')) {
+            $type = $this->option('type');
+        }
 
         if ($area) {
             $areas = [$area];
@@ -74,7 +79,7 @@ class Clear extends Command
         
         $this->line("==============================================");
 
-        $app['theme.deployer']->setConsole($this)->clear($areas, $theme, $module);
+        $app['theme.deployer']->setConsole($this)->clear($areas, $theme, $module, $type);
     }
 
     /**
