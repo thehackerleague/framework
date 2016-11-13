@@ -92,7 +92,7 @@ class Deployer extends Console
             if (!$theme && !$module) {
                 $this->info("Clearing asset for {$area} section.");
                 $this->files->cleanDirectory(
-                    $this->getPath([
+                    formPath([
                         $this->basePath, 'assets', $area
                     ])
                 );
@@ -119,7 +119,7 @@ class Deployer extends Console
     {
         foreach ($areaPaths as $themekey => $locations) {
             foreach (['sass' => 'scss', 'less' => 'less'] as $lang => $ext) {
-                $themePath = $this->getPath(
+                $themePath = formPath(
                     [$this->basePath, 'assets', $area, $themekey, $lang]
                 );
                 if ($this->files->exists($themePath)) {
@@ -140,8 +140,8 @@ class Deployer extends Console
         $resourcePath = 'assets';
         foreach ($assetType as $type) {
             if ($this->files->copyDirectory(
-                $this->getPath([$location, $type]),
-                $this->getPath([$this->basePath, $resourcePath, $area, $theme, $type, $namespace])
+                formPath([$location, $type]),
+                formPath([$this->basePath, $resourcePath, $area, $theme, $type, $namespace])
             )) {
                 $this->info("Moving `{$type}`.");
             } else {
@@ -156,7 +156,7 @@ class Deployer extends Console
         $assetType = $this->config->get('theme.asset', []);
         foreach ($assetType as $type) {
             $this->info("Cleaing `{$type}`.");
-            $this->files->cleanDirectory($this->getPath([
+            $this->files->cleanDirectory(formPath([
                 $this->basePath, 'assets', $area, $theme, $type, $namespace
             ]));
         }
@@ -169,8 +169,8 @@ class Deployer extends Console
         $resourcePath = 'assets';
         foreach ($assetType as $type) {
             if ($this->files->copyDirectory(
-                $this->getPath([$location, $type]),
-                $this->getPath([$this->basePath, $resourcePath, $area, $theme, $type])
+                formPath([$location, $type]),
+                formPath([$this->basePath, $resourcePath, $area, $theme, $type])
             )) {
                 $this->info("Moving `{$type}`.");
             } else {
@@ -182,7 +182,7 @@ class Deployer extends Console
     protected function clearPathAsset($area, $theme)
     {
         $this->info("Clearing files from `{$area}` ==> `{$theme}` location.");
-        $this->files->cleanDirectory($this->getPath([
+        $this->files->cleanDirectory(formPath([
             $this->basePath, 'assets', $area, $theme
         ]));
     }

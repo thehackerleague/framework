@@ -50,8 +50,8 @@ abstract class Move
         $base = ['assets', $area, $theme, $this->getType()];
 
         if ($this->files->copyDirectory(
-            $this->getPath(array_merge([$this->container['path.resources']], $base)),
-            $this->getPath(array_merge([$this->container['path.public']], $base))
+            formPath(array_merge([$this->container['path.resources']], $base)),
+            formPath(array_merge([$this->container['path.public']], $base))
         )) {
             $console->info("\t* Publishing `{$this->getType()}` in {$area} ==> {$theme}.");
         } else {
@@ -62,7 +62,7 @@ abstract class Move
         foreach ($asset as $handle => $contents) {
             foreach ($contents as $content) {
                 $base = ['assets', $area, $theme, $this->getType(), str_replace('%baseurl','',$content)];
-                $destination = $this->getPath(array_merge([$this->container['path.public']], $base));
+                $destination = formPath(array_merge([$this->container['path.public']], $base));
                 $destination = $this->files->dirname($destination);
 
                 if(!$this->files->isDirectory($destination)) {
@@ -70,12 +70,12 @@ abstract class Move
                 }
 
                 if ($this->files->copy(
-                    $this->getPath(array_merge([$this->container['path.resources']], $base)),
-                    $this->getPath(array_merge([$this->container['path.public']], $base))
+                    formPath(array_merge([$this->container['path.resources']], $base)),
+                    formPath(array_merge([$this->container['path.public']], $base))
                 )) {
-                    $console->info("Publishing `{$this->getPath($base)}` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
+                    $console->info("Publishing `".formPath($base)."` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
                 } else {
-                    $console->warn("`{$this->getPath($base)}` file not found in {$area} ==> {$theme}.");
+                    $console->warn("`".formPath($base)."` file not found in {$area} ==> {$theme}.");
                 }
             }
         }
@@ -95,10 +95,5 @@ abstract class Move
             throw new \InvalidArgumentException('No Asset type given');
         }
         return $this->type;
-    }
-
-    protected function getPath($paths)
-    {
-        return implode(DIRECTORY_SEPARATOR, $paths);
     }
 }

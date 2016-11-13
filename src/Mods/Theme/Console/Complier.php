@@ -69,7 +69,7 @@ class Complier extends Console
 
     protected function readConfig()
     {
-        $configPath = $this->getPath(
+        $configPath = formPath(
             [$this->basePath, 'assets', 'config.json']
         );
         return $this->files->get($configPath);
@@ -77,7 +77,7 @@ class Complier extends Console
 
     protected function writeManifest($manifest, $area, $theme)
     {
-        $configPath = $this->getPath(
+        $configPath = formPath(
             [$this->basePath, 'assets', $area, $theme, 'manifest.json']
         );
         $this->files->put(

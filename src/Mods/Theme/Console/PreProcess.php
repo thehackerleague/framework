@@ -182,7 +182,7 @@ class PreProcess extends Console
 
     protected function writeConfig($manifest)
     {
-        $configPath = $this->getPath(
+        $configPath = formPath(
             [$this->basePath, 'assets', 'config.json']
         );
         $this->files->put(

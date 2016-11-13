@@ -62,7 +62,7 @@ abstract class Minifier
                     'assets', $area, $theme,
                     $this->getType(), str_replace('%baseurl', '', $content)
                 ];
-                $destination = $this->getPath([
+                $destination = formPath([
                     $this->container['path.resources'], 'assets', $area,
                     $theme, $this->getType(), 'min',
                     str_replace('%baseurl', '', $content)
@@ -75,7 +75,7 @@ abstract class Minifier
                 }
                 $destination .= '/'.$filename;
 
-                $origin = $this->getPath(array_merge([$this->container['path.resources']], $base));
+                $origin = formPath(array_merge([$this->container['path.resources']], $base));
                 $minifedContent = $this->minify($this->files->get($origin));
 
                 if ($this->files->put(
@@ -83,9 +83,9 @@ abstract class Minifier
                     $minifedContent,
                     true
                 )) {
-                    $console->info("\t* Minifing `{$this->getPath($base)}` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
+                    $console->info("\t* Minifing `".formPath($base)."` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
                 } else {
-                    $console->warn("`{$this->getPath($base)}` file not found in {$area} ==> {$theme}.");
+                    $console->warn("`".formPath($base)."` file not found in {$area} ==> {$theme}.");
                 }
 
                 $asset[$handle][$key] = str_replace('%baseurl', '%baseurlmin/', $content);
@@ -126,10 +126,5 @@ abstract class Minifier
             throw new \InvalidArgumentException('No Asset type given');
         }
         return $this->type;
-    }
-
-    protected function getPath($paths)
-    {
-        return implode(DIRECTORY_SEPARATOR, $paths);
     }
 }

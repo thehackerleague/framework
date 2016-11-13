@@ -54,16 +54,16 @@ abstract class Bundle
             $this->container['path.resources'], 'assets', $area,
             $theme, $this->getType(), 'bundle'
         ];
-        $destination = $this->getPath($basePaths);
+        $destination = formPath($basePaths);
 
         if (!$this->files->isDirectory($destination)) {
             $this->files->makeDirectory($destination, 0777, true);
         }
         foreach ($asset as $handle => $contents) {
-            $destination = $this->getPath(array_merge($basePaths, ["$handle.{$this->getType()}"]));
+            $destination = formPath(array_merge($basePaths, ["$handle.{$this->getType()}"]));
             $this->files->put($destination, '');
             foreach ($contents as $key => $content) {
-                $origin = $this->getPath([
+                $origin = formPath([
                     $this->container['path.resources'], 'assets', $area,
                     $theme, $this->getType(),
                     str_replace('%baseurl', '', $content)
@@ -75,7 +75,7 @@ abstract class Bundle
                 )) {
                     $console->info("\t* Reading `$origin` for `{$handle}` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
                 } else {
-                    $console->warn("`{$this->getPath($base)}` file not found in {$area} ==> {$theme}.");
+                    $console->warn("`".formPath($base)."` file not found in {$area} ==> {$theme}.");
                 }
             }
             $console->info("\t* Bundling `{$this->getType()}` for `{$handle}` in {$area} ==> {$theme}.");
@@ -97,10 +97,5 @@ abstract class Bundle
             throw new \InvalidArgumentException('No Asset type given');
         }
         return $this->type;
-    }
-
-    protected function getPath($paths)
-    {
-        return implode(DIRECTORY_SEPARATOR, $paths);
     }
 }

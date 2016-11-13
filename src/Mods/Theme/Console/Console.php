@@ -12,11 +12,6 @@ abstract class Console
         return $this;
     }
 
-    protected function getPath($paths)
-    {
-        return implode(DIRECTORY_SEPARATOR, $paths);
-    }
-
     protected function info($msg)
     {
         if ($this->console) {
