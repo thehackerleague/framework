@@ -54,6 +54,7 @@ class Compile extends Command
         } else {
             $areas = array_merge(['frontend'], array_values($app['config']->get('app.areas', [])));
         }
+        $this->line("==============================================");
         
         $deployer = $app['theme.deployer']->setConsole($this);
         $complier = $app['theme.complier']->setConsole($this);

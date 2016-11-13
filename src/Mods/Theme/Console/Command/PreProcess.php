@@ -71,7 +71,7 @@ class PreProcess extends Command
         } else {
             $areas = array_merge(['frontend'], array_values($app['config']->get('app.areas', [])));
         }
-
+        $this->line("==============================================");
         $app['theme.preprocessor']->setConsole($this)->process($areas, $theme, $module);
     }
 

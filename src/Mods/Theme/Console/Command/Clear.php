@@ -71,6 +71,8 @@ class Clear extends Command
         } else {
             $areas = array_merge(['frontend'], array_values($app['config']->get('app.areas', [])));
         }
+        
+        $this->line("==============================================");
 
         $app['theme.deployer']->setConsole($this)->clear($areas, $theme, $module);
     }
