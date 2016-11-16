@@ -47,20 +47,19 @@ abstract class Bundle
     {
         extract($traveler);
         $traveler['manifest']['bundled'] = false;
-        if (!$console->option('bundle')) {
+        if (!$console->option('bundle') || $console->option('simple')) {
             return $pass($traveler);
         }
         $basePaths = [
-            $this->container['path.resources'], 'assets', $area,
-            $theme, $this->getType(), 'bundle'
+            $this->container['path.public'], 'assets', 'bundle'
         ];
         $destination = formPath($basePaths);
-
         if (!$this->files->isDirectory($destination)) {
             $this->files->makeDirectory($destination, 0777, true);
         }
         foreach ($asset as $handle => $contents) {
-            $destination = formPath(array_merge($basePaths, ["$handle.{$this->getType()}"]));
+            $filename = md5($area.$theme.$handle);
+            $destination = formPath(array_merge($basePaths, ["$filename.{$this->getType()}"]));
             $this->files->put($destination, '');
             foreach ($contents as $key => $content) {
                 $origin = formPath([
@@ -78,7 +77,7 @@ abstract class Bundle
                     $console->warn("`".formPath($base)."` file not found in {$area} ==> {$theme}.");
                 }
             }
-            $console->info("\t* Bundling `{$this->getType()}` for `{$handle}` in {$area} ==> {$theme}.");
+            $console->info("\t* Bundling `{$this->getType()}` for `{$handle}` in {$area} ==> {$theme} to public.");
         }
         
         $traveler['manifest']['bundled'] = true;

@@ -47,6 +47,10 @@ abstract class Move
     {
         extract($traveler);
 
+        if ($manifest['bundled']) {
+            return $pass($traveler);
+        }
+
         $base = ['assets', $area, $theme, $this->getType()];
 
         if ($this->files->copyDirectory(

@@ -11,6 +11,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\Console\Output\OutputInterface;
 use MJS\TopSort\Implementations\FixedArraySort as SortAssets;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class PreProcess extends Console
 {
@@ -78,8 +79,6 @@ class PreProcess extends Console
     public function process($areas, $theme = null)
     {
         $manifest = [];
-        $assets = $this->config->get('theme.asset', []);
-        
         $oldArea = $this->application['area'];
         $oldLayoutXmlLocation = $this->config->get('layout.xml_location');
 
@@ -118,7 +117,7 @@ class PreProcess extends Console
             $this->line("==============================================");
         }
 
-        $this->writeConfig(['assets' => $assets, 'areas' => $manifest]);
+        $this->writeConfig($manifest);
 
         $this->application['area'] = $oldArea;
         $this->config->set('layout.xml_location', $oldLayoutXmlLocation);
@@ -192,8 +191,20 @@ class PreProcess extends Console
         $configPath = formPath(
             [$this->basePath, 'assets', 'config.json']
         );
+        $manifestOld = [];
+        try {
+            $manifestOld = json_decode($this->files->get($configPath), true);
+            foreach ($manifest as $area => $themes) {
+                foreach ($themes as $theme => $assets) {
+                    foreach ($assets as $key => $asset) {
+                        $manifestOld['areas'][$area][$theme][$key] = $asset;
+                    }
+                }
+            }
+        } catch (FileNotFoundException $e) {
+        }
         $this->files->put(
-            $configPath, json_encode($manifest, JSON_PRETTY_PRINT)
+            $configPath, json_encode($manifestOld, JSON_PRETTY_PRINT)
         );
     }
 }

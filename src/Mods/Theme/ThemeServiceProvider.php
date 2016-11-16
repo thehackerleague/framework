@@ -80,6 +80,7 @@ class ThemeServiceProvider extends ServiceProvider
             return new Deployer(
                 $app['files'],
                 $app['theme.asset.resolver'],
+                $app['theme.resolver'],
                 $app['config'],
                 $app['path.resources']
             );

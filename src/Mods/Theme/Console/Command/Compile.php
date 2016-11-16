@@ -16,7 +16,7 @@ class Compile extends Command
         {--m|minify : Minify the assets.}
         {--b|bundle : Bundle the assets.}
         {--o|only : Run only compilation.}
-        {--p|skipPreProcess : Skip pre process.}
+        {--s|simple : Use simple compilation.}
         {--type= : Compile only the given type.}
         {--area= : The area to be compile.}
     	{--theme= : The theme to be compile.}
@@ -69,8 +69,8 @@ class Compile extends Command
         if (!$this->option('only')) {
             $deployer->clear($areas, $theme, $module, $type);
             $deployer->deploy($areas, $theme, $module, $type);
-
-            if (!$this->option('skipPreProcess')) {
+            
+            if (!$this->option('simple')) {
                 $preprocessor->process($areas, $theme);
             }
         }

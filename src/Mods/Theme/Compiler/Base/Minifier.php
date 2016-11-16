@@ -56,6 +56,88 @@ abstract class Minifier
             return $pass($traveler);
         }
 
+        $destination = formPath([
+            $this->container['path.resources'], 'assets', $area,
+            $theme, $this->getType(), 'min'
+        ]);
+
+        if (!$this->files->isDirectory($destination)) {
+            $this->files->makeDirectory($destination, 0777, true);
+        } else {
+            $this->files->cleanDirectory($destination);
+        }
+
+        if ($console->option('simple')) {
+            $this->simpleMinfier($area, $theme, $console);
+        } else {
+            $asset = $this->processedMinfier($asset, $area, $theme, $console);
+        }
+
+        $console->info("\t* Minification for {$this->getType()} in {$area} ==> {$theme} done.");
+
+        $traveler['asset'] = $asset;
+        $traveler['manifest']['minified'] = true;
+        return $pass($traveler);
+    }
+
+    /**
+     *
+     *
+     * @param string $area
+     * @param string $theme
+     * @param $console
+     *
+     * @return array
+     */
+    protected function simpleMinfier($area, $theme, $console)
+    {
+        $base = [
+            $this->container['path.resources'], 'assets', $area,
+            $theme, $this->getType()
+        ];
+        $originPath = formPath($base);
+
+        $files = $this->files->allFiles($originPath);
+
+        foreach ($files as $file) {
+            $destination = formPath(array_merge($base, [
+                'min',
+                $file->getRelativePath()
+            ]));
+            $filename = $file->getFileName();
+
+            if (!$this->files->isDirectory($destination)) {
+                $this->files->makeDirectory($destination, 0777, true);
+            }
+            $destination .= '/'.$filename;
+
+            $origin = $file->getPathName();
+            $minifedContent = $this->minify($this->files->get($origin));
+
+            if ($this->files->put(
+                $destination,
+                $minifedContent,
+                true
+            )) {
+                $console->info("\t* Minifing `".$origin."` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
+            } else {
+                $console->warn("`".$origin."` file not found in {$area} ==> {$theme}.");
+            }
+        }
+    }
+    
+    /**
+     *
+     *
+     * @param array $asset
+     * @param string $area
+     * @param string $theme
+     * @param $console
+     *
+     * @return array
+     */
+    protected function processedMinfier($asset, $area, $theme, $console)
+    {
         foreach ($asset as $handle => $contents) {
             foreach ($contents as $key => $content) {
                 $base = [
@@ -92,11 +174,7 @@ abstract class Minifier
             }
         }
 
-        $console->info("\t* Minification for {$this->getType()} in {$area} ==> {$theme} done.");
-
-        $traveler['asset'] = $asset;
-        $traveler['manifest']['minified'] = true;
-        return $pass($traveler);
+        return $asset;
     }
 
     /**

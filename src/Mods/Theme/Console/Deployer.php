@@ -3,6 +3,7 @@
 namespace  Mods\Theme\Console;
 
 use Mods\Theme\AssetResolver;
+use Mods\Theme\ThemeResolver;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
@@ -24,6 +25,13 @@ class Deployer extends Console
     protected $assetResolver;
 
     /**
+     * The view finder implementation.
+     *
+     * @var \Mods\Theme\ThemeResolver
+     */
+    protected $themeResolver;
+
+    /**
      * The config instance.
      *
      * @var \Illuminate\Contracts\Config\Repository
@@ -42,6 +50,7 @@ class Deployer extends Console
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Mods\Theme\AssetResolver $assetResolver
+     * @param  \Mods\Theme\ThemeResolver $themeResolver
      * @param  \Illuminate\Contracts\Config\Repository  $config
      * @param  string $basePath
      * @return void
@@ -49,12 +58,14 @@ class Deployer extends Console
     public function __construct(
         Filesystem $files,
         AssetResolver $assetResolver,
+        ThemeResolver $themeResolver,
         ConfigContract $config,
         $basePath
     ) {
         $this->files = $files;
         $this->config = $config;
         $this->assetResolver = $assetResolver;
+        $this->themeResolver = $themeResolver;
         $this->basePath = $basePath;
     }
 
@@ -81,10 +92,32 @@ class Deployer extends Console
 
             $this->info("Deloyed asset for {$area} section");
             $this->line("==============================================");
-            if(!$type || ($type && in_array($type, ['sass', 'less']))) {
+            if (!$type || ($type && in_array($type, ['sass', 'less']))) {
                 $this->combineModuleAssests($area, $areaPaths);
             }
         }
+        $this->writeConfig();
+    }
+
+    protected function writeConfig()
+    {
+        $manifest = [];
+        $assets = $this->config->get('theme.asset', []);
+
+        $areas = array_merge(['frontend'], array_values($this->config->get('app.areas', [])));
+        foreach ($areas as $area) {
+            $themes = $this->themeResolver->themeCollection($area);
+            foreach ($themes as $key => $theme) {
+                $manifest[$area][$key] = array_flip($assets);
+            }
+        }
+        
+        $configPath = formPath(
+            [$this->basePath, 'assets', 'config.json']
+        );
+        $this->files->put(
+            $configPath, json_encode(['assets' => $assets, 'areas' => $manifest], JSON_PRETTY_PRINT)
+        );
     }
 
     public function clear($areas, $theme = null, $module = null, $type = null)
@@ -140,8 +173,8 @@ class Deployer extends Console
     {
         $this->info("\t* Deploying files from `{$namespace}` module.");
         $assetType = $this->config->get('theme.asset', []);
-        if($type) {
-            $assetType = array_intersect($assetType, [$type]);    
+        if ($type) {
+            $assetType = array_intersect($assetType, [$type]);
         }
         $resourcePath = 'assets';
         foreach ($assetType as $type) {
@@ -160,8 +193,8 @@ class Deployer extends Console
     {
         $this->info("\t* Clearing files from `{$area}` ==> `{$theme}` ==> `{$namespace}`  module.");
         $assetType = $this->config->get('theme.asset', []);
-        if($type) {
-            $assetType = array_intersect($assetType, [$type]);    
+        if ($type) {
+            $assetType = array_intersect($assetType, [$type]);
         }
         foreach ($assetType as $type) {
             $this->info("\t\t* Clearing `{$type}`.");
@@ -175,8 +208,8 @@ class Deployer extends Console
     {
         $this->info("\t* Deploying files from `{$location}` location.");
         $assetType = $this->config->get('theme.asset', []);
-        if($type) {
-            $assetType = array_intersect($assetType, [$type]);    
+        if ($type) {
+            $assetType = array_intersect($assetType, [$type]);
         }
         $resourcePath = 'assets';
         foreach ($assetType as $type) {
@@ -197,7 +230,7 @@ class Deployer extends Console
         $basePath = [
             $this->basePath, 'assets', $area, $theme
         ];
-        if($type) {
+        if ($type) {
             $basePath[] = $type;
             $this->info("\t\t* Clearing `{$type}`.");
         }

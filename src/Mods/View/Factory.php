@@ -63,12 +63,9 @@ class Factory
         $routeHandler = $this->pageFactory->routeHandler();
 
         if (isset($manifest['bundled']) && $manifest['bundled']) {
-            $head['js'] = '<script src="'.
-                $this->getJsBaseUrl($area, $theme).'bundle/'.$routeHandler.
-            '.js"></script>';
-            $head['css'] = '<link href="'.
-                $this->getCssBaseUrl($area, $theme).'bundle/'.$routeHandler.
-            '.css" media="all" rel="stylesheet" />';
+            $name = $this->getAssetBaseUrl('bundle/').md5($area.$theme.$routeHandler);
+            $head['js'] = '<script src="'.$name.'.js"></script>';
+            $head['css'] = '<link href="'.$name.'.css" media="all" rel="stylesheet" />';
         } else {
             $minified = (isset($manifest['minified']) && $manifest['minified']);
             $minified = ($minified)?'min/':'';
@@ -82,6 +79,17 @@ class Factory
             );
         }
         return $head;
+    }
+
+    /**
+     * Get the base url for asset
+     *
+     * @param string $path
+     * @return string
+     */
+    public function getAssetBaseUrl($path)
+    {
+        return asset("assets/$path").'/';
     }
 
     /**
