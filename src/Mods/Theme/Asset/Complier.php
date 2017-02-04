@@ -1,6 +1,6 @@
 <?php
 
-namespace  Mods\Theme\Console;
+namespace  Mods\Theme\Asset;
 
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -66,7 +66,7 @@ class Complier extends Console
                 }
             }
         } catch (FileNotFoundException $e) {
-            $this->console->error("Unexpectedly somthing went wrong during deployment.");
+            $this->console->error("Unexpectedly something went wrong during deployment.");
         }
     }
 

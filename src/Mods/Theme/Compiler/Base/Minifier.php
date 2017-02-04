@@ -56,17 +56,6 @@ abstract class Minifier
             return $pass($traveler);
         }
 
-        $destination = formPath([
-            $this->container['path.resources'], 'assets', $area,
-            $theme, $this->getType(), 'min'
-        ]);
-
-        if (!$this->files->isDirectory($destination)) {
-            $this->files->makeDirectory($destination, 0777, true);
-        } else {
-            $this->files->cleanDirectory($destination);
-        }
-
         if ($console->option('simple')) {
             $this->simpleMinfier($area, $theme, $console);
         } else {
@@ -91,25 +80,18 @@ abstract class Minifier
      */
     protected function simpleMinfier($area, $theme, $console)
     {
-        $base = [
+        $originPath = formPath([
             $this->container['path.resources'], 'assets', $area,
             $theme, $this->getType()
-        ];
-        $originPath = formPath($base);
+        ]);
 
         $files = $this->files->allFiles($originPath);
 
         foreach ($files as $file) {
-            $destination = formPath(array_merge($base, [
-                'min',
-                $file->getRelativePath()
-            ]));
-            $filename = $file->getFileName();
-
-            if (!$this->files->isDirectory($destination)) {
-                $this->files->makeDirectory($destination, 0777, true);
-            }
-            $destination .= '/'.$filename;
+            $destination = str_replace(
+                '.'.$this->getType(), '.min.'.$this->getType(),
+                $file->getPathName()
+            );
 
             $origin = $file->getPathName();
             $minifedContent = $this->minify($this->files->get($origin));
@@ -140,24 +122,15 @@ abstract class Minifier
     {
         foreach ($asset as $handle => $contents) {
             foreach ($contents as $key => $content) {
-                $base = [
-                    'assets', $area, $theme,
+                $origin = formPath([
+                    $this->container['path.resources'], 'assets', $area, $theme,
                     $this->getType(), str_replace('%baseurl', '', $content)
-                ];
-                $destination = formPath([
-                    $this->container['path.resources'], 'assets', $area,
-                    $theme, $this->getType(), 'min',
-                    str_replace('%baseurl', '', $content)
                 ]);
-                $filename = $this->files->basename($destination);
-                $destination = $this->files->dirname($destination);
 
-                if (!$this->files->isDirectory($destination)) {
-                    $this->files->makeDirectory($destination, 0777, true);
-                }
-                $destination .= '/'.$filename;
-
-                $origin = formPath(array_merge([$this->container['path.resources']], $base));
+                $destination = str_replace(
+                    '.'.$this->getType(), '.min.'.$this->getType(),
+                    $origin
+                );
                 $minifedContent = $this->minify($this->files->get($origin));
 
                 if ($this->files->put(
@@ -165,12 +138,12 @@ abstract class Minifier
                     $minifedContent,
                     true
                 )) {
-                    $console->info("\t* Minifing `".formPath($base)."` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
+                    $console->info("\t* Minifing `".$origin."` in {$area} ==> {$theme}.", OutputInterface::VERBOSITY_DEBUG);
                 } else {
-                    $console->warn("`".formPath($base)."` file not found in {$area} ==> {$theme}.");
+                    $console->warn("`".$origin."` file not found in {$area} ==> {$theme}.");
                 }
 
-                $asset[$handle][$key] = str_replace('%baseurl', '%baseurlmin/', $content);
+                $asset[$handle][$key] = str_replace('.'.$this->getType(), '.min.'.$this->getType(), $content);
             }
         }
 

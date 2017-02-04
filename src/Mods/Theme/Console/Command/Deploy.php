@@ -78,11 +78,8 @@ class Deploy extends Command
         }
         $this->line("==============================================");
         
-        $deployer = $app['theme.deployer']->setConsole($this);
-
-        $deployer->clear($areas, $theme, $module, $type);
-
-        $deployer->deploy($areas, $theme, $module, $type);
+        $app['theme.clear']->setConsole($this)->clear($areas, $theme, $module, $type);
+        $app['theme.deployer']->setConsole($this)->deploy($areas, $theme, $module, $type);
 
         $this->info("\n");
         $this->info("Deployed successfully!");

@@ -68,13 +68,12 @@ class Factory
             $head['css'] = '<link href="'.$name.'.css" media="all" rel="stylesheet" />';
         } else {
             $minified = (isset($manifest['minified']) && $manifest['minified']);
-            $minified = ($minified)?'min/':'';
             $head['js'] = str_replace(
-                '%baseurl', $this->getJsBaseUrl($area, $theme).$minified,
+                ['%baseurl', '.js'], [$this->getJsBaseUrl($area, $theme), ($minified)?'.min.js':'.js'],
                 $head['js']
             );
             $head['css'] = str_replace(
-                '%baseurl', $this->getCssBaseUrl($area, $theme).$minified,
+                ['%baseurl', '.css'], [$this->getCssBaseUrl($area, $theme), ($minified)?'.min.css':'.css'],
                  $head['css']
             );
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace  Mods\Theme\Console;
+namespace  Mods\Theme\Asset;
 
 abstract class Console
 {

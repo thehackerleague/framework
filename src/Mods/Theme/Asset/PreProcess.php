@@ -1,6 +1,6 @@
 <?php
 
-namespace  Mods\Theme\Console;
+namespace  Mods\Theme\Asset;
 
 use Mods\Theme\ThemeResolver;
 use Mods\View\Factory as ViewFactory;

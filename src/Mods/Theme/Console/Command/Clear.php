@@ -13,6 +13,8 @@ class Clear extends Command
      * @var string
      */
     protected $signature = 'theme:clear
+        {--p|public : Clear asset in public.}
+        {--b|bundle : Clear bundled asset in public.}
         {--area= : The area to be clear.}
     	{--theme= : The theme to be clear.}
     	{--module= : The module to be clear for the theme or area.}
@@ -79,7 +81,15 @@ class Clear extends Command
         
         $this->line("==============================================");
 
-        $app['theme.deployer']->setConsole($this)->clear($areas, $theme, $module, $type);
+        $clearPublic = $this->option('public');
+
+        $app['theme.clear']->setConsole($this)->clear(
+            $areas, $theme, $module,
+            $type, $clearPublic
+        );
+
+        if ($this->option('bundle')) {
+        }
     }
 
     /**

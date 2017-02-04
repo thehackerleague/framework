@@ -1,6 +1,6 @@
 <?php
 
-namespace  Mods\Theme\Console;
+namespace  Mods\Theme\Asset;
 
 use Mods\Theme\AssetResolver;
 use Mods\Theme\ThemeResolver;
@@ -120,37 +120,6 @@ class Deployer extends Console
         );
     }
 
-    public function clear($areas, $theme = null, $module = null, $type = null)
-    {
-        foreach ($areas as $area) {
-            $this->info("Preparing {$area} section.");
-            if (!$theme && !$module) {
-                $this->info("\t* Clearing asset for {$area} section.");
-                $this->files->cleanDirectory(
-                    formPath([
-                        $this->basePath, 'assets', $area
-                    ])
-                );
-                continue;
-            }
-
-            $areaHints = $this->assetResolver->getHints($area, $module);
-            $areaPaths = $this->assetResolver->getPaths($area, $theme);
-
-            foreach ($areaPaths as $themekey => $locations) {
-                if (!$module && $theme) {
-                    $this->clearPathAsset($area, $themekey, $type);
-                    continue;
-                }
-
-                foreach ($areaHints as $namespace => $location) {
-                    $this->clearHintAsset($namespace, $area, $themekey, $type);
-                }
-            }
-        }
-        $this->line("==============================================");
-    }
-
     protected function combineModuleAssests($area, $areaPaths)
     {
         foreach ($areaPaths as $themekey => $locations) {
@@ -189,21 +158,6 @@ class Deployer extends Console
         }
     }
 
-    protected function clearHintAsset($namespace, $area, $theme, $type)
-    {
-        $this->info("\t* Clearing files from `{$area}` ==> `{$theme}` ==> `{$namespace}`  module.");
-        $assetType = $this->config->get('theme.asset', []);
-        if ($type) {
-            $assetType = array_intersect($assetType, [$type]);
-        }
-        foreach ($assetType as $type) {
-            $this->info("\t\t* Clearing `{$type}`.");
-            $this->files->cleanDirectory(formPath([
-                $this->basePath, 'assets', $area, $theme, $type, $namespace
-            ]));
-        }
-    }
-
     protected function movePathAsset($location, $area, $theme, $type)
     {
         $this->info("\t* Deploying files from `{$location}` location.");
@@ -222,19 +176,6 @@ class Deployer extends Console
                 $this->warn("\t\t* `{$type}` not found.");
             }
         }
-    }
-
-    protected function clearPathAsset($area, $theme, $type)
-    {
-        $this->info("\t* Clearing files from `{$area}` ==> `{$theme}` location.");
-        $basePath = [
-            $this->basePath, 'assets', $area, $theme
-        ];
-        if ($type) {
-            $basePath[] = $type;
-            $this->info("\t\t* Clearing `{$type}`.");
-        }
-        $this->files->cleanDirectory(formPath($basePath));
     }
 
     protected function writeThemeFiles($content, $name, $path)

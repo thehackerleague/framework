@@ -5,22 +5,18 @@ namespace Mods\Theme\Console\Command;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class Compile extends Command
+class Webpack extends Command
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $signature = 'theme:compile
-        {--m|minify : Minify the assets.}
-        {--b|bundle : Bundle the assets.}
-        {--o|only : Run only compilation.}
-        {--s|simple : Use simple compilation.}
+    protected $signature = 'theme:webpack
         {--type= : Compile only the given type.}
         {--area= : The area to be compile.}
-    	{--theme= : The theme to be compile.}
-    	{--module= : The module to be compile for the theme or area.}
+        {--theme= : The theme to be compile.}
+        {--module= : The module to be compile for the theme or area.}
     ';
 
     /**
@@ -28,7 +24,7 @@ class Compile extends Command
      *
      * @var string
      */
-    protected $description = 'Compile the Theme & Module asset and ship it.';
+    protected $description = 'Prepare the assets for webpack.';
 
     /**
      * Execute the console command.
@@ -64,23 +60,12 @@ class Compile extends Command
         
         $deployer = $app['theme.deployer']->setConsole($this);
         $clear = $app['theme.clear']->setConsole($this);
-        $complier = $app['theme.complier']->setConsole($this);
         $preprocessor = $app['theme.preprocessor']->setConsole($this);
 
-        if (!$this->option('only')) {
-            $clear->clear($areas, $theme, $module, $type, true);
-            $deployer->deploy($areas, $theme, $module, $type);
-            
-            if (!$this->option('simple')) {
-                if ($this->option('bundle')) {
-                    $clear->bundled();
-                    $this->line("==============================================");
-                }
-                $preprocessor->process($areas, $theme);
-            }
-        }
+        $clear->clear($areas, $theme, $module, $type, true);
+        $deployer->deploy($areas, $theme, $module, $type);
 
-        $complier->compile($areas, $theme, $module, $type);
+        $preprocessor->process($areas, $theme);
     }
 
     /**
