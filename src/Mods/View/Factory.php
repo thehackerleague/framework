@@ -62,7 +62,12 @@ class Factory
         $manifest = $this->fetchManifest($area, $theme);
         $routeHandler = $this->pageFactory->routeHandler();
 
-        if (isset($manifest['bundled']) && $manifest['bundled']) {
+        if (isset($manifest['webpack']) && $manifest['webpack']) {
+            $head['js'] = '<script src="'.$this->getAssetBaseUrl($area."/".$theme).'vendor.js"></script>'."\n".
+                          '<script src="'.$this->getAssetBaseUrl($area."/".$theme).$routeHandler.'.js"></script>';
+                          
+            $head['css'] = '<link href="'.$this->getAssetBaseUrl($area."/".$theme).$routeHandler.'.css" media="all" rel="stylesheet" />';
+        } elseif (isset($manifest['bundled']) && $manifest['bundled']) {
             $name = $this->getAssetBaseUrl('bundle/').md5($area.$theme.$routeHandler);
             $head['js'] = '<script src="'.$name.'.js"></script>';
             $head['css'] = '<link href="'.$name.'.css" media="all" rel="stylesheet" />';

@@ -111,8 +111,10 @@ class PreProcess extends Console
                         $handle,
                         $manifest[$area][$key]
                     );
+                    $manifest['handles'][$area][] = $handle;
                 }
             }
+            $manifest['handles'][$area] = array_unique($manifest['handles'][$area]);
             $this->info("Pre Processing for {$area} section done.");
             $this->line("==============================================");
         }
@@ -191,6 +193,9 @@ class PreProcess extends Console
         $configPath = formPath(
             [$this->basePath, 'assets', 'config.json']
         );
+
+        $handles = $manifest['handles'];
+        unset($manifest['handles']);
         $manifestOld = [];
         try {
             $manifestOld = json_decode($this->files->get($configPath), true);
@@ -203,6 +208,7 @@ class PreProcess extends Console
             }
         } catch (FileNotFoundException $e) {
         }
+        $manifestOld['handles'] = $handles;
         $this->files->put(
             $configPath, json_encode($manifestOld, JSON_PRETTY_PRINT)
         );

@@ -58,7 +58,7 @@ class Complier extends Console
                     $themes = array_intersect_key($themes, [$theme => 1]);
                 }
                 foreach ($themes as $key => $assets) {
-                    if ($theme) {
+                    if ($type) {
                         $assets = array_intersect_key($assets, [$type => 1]);
                     }
                     $manifest = $this->compiler->handle($area, $key, $assets, $this->console);

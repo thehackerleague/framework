@@ -29,26 +29,6 @@ class Clear extends Command
     protected $description = 'Clear the asset.';
 
     /**
-     * The filesystem instance.
-     *
-     * @var \Illuminate\Filesystem\Filesystem
-     */
-    protected $files;
-
-    /**
-     * Create a new config cache command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
-     */
-    public function __construct(Filesystem $files)
-    {
-        parent::__construct();
-
-        $this->files = $files;
-    }
-
-    /**
      * Execute the console command.
      *
      * @return void
@@ -85,11 +65,8 @@ class Clear extends Command
 
         $app['theme.clear']->setConsole($this)->clear(
             $areas, $theme, $module,
-            $type, $clearPublic
+            $type, $clearPublic, $this->option('bundle')
         );
-
-        if ($this->option('bundle')) {
-        }
     }
 
     /**

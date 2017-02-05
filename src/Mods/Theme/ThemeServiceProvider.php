@@ -58,13 +58,13 @@ class ThemeServiceProvider extends ServiceProvider
     protected function registerThemeDeployer()
     {
         $this->app->singleton('command.theme.deploy', function ($app) {
-            return new Command\Deploy($app['files']);
+            return new Command\Deploy();
         });
         $this->app->singleton('command.theme.clear', function ($app) {
-            return new Command\Clear($app['files']);
+            return new Command\Clear();
         });
         $this->app->singleton('command.theme.preprocessor', function ($app) {
-            return new Command\PreProcess($app['files']);
+            return new Command\PreProcess();
         });
         $this->app->singleton('command.theme.compile', function ($app) {
             return new Command\Compile();
@@ -120,6 +120,16 @@ class ThemeServiceProvider extends ServiceProvider
                 $app['Mods\View\Factory'],
                 $app['theme.resolver'],
                 $app['config']
+            );
+        });
+
+        $this->app->singleton('theme.webpack', function ($app) {
+            return new Asset\Webpack(
+                $app['files'],
+                $app['theme.asset.resolver'],
+                $app['config'],
+                $app['path.resources'],
+                $app['path.public']
             );
         });
     }
