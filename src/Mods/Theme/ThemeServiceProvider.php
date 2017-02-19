@@ -2,6 +2,7 @@
 
 namespace Mods\Theme;
 
+use Blade;
 use Mods\Theme\Asset;
 use Mods\Theme\Console\Command;
 use Mods\Support\ServiceProvider;
@@ -16,6 +17,11 @@ class ThemeServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Blade::directive('asset_img', function ($expression) {
+            $area = app()->area();
+            $theme = app('Mods\Theme\Factory')->getActiveTheme($area);
+            return asset("assets/{$area}/{$theme}/img/{$expression}");
+        });
     }
 
     /**
