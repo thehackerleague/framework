@@ -86,7 +86,7 @@ class Webpack extends Console
                     foreach ($handles[$area] as $handle) {
                         $collection = [];
                         foreach ($aAssets as $type) {
-                            if(isset($assets[$type]) && !is_array($assets[$type])) { continue; }
+                            if(!isset($assets[$type]) || !is_array($assets[$type])) { continue; }
                             $basePath = formPath([$this->basePath, 'assets', $area, $key, $type]);
                             $mutatedValue = array_map(function ($val) use ($basePath) {
                                 $fullPath = formPath([$basePath, str_replace('%baseurl', '', $val)]);
