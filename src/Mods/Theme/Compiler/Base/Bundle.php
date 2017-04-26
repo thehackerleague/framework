@@ -2,11 +2,12 @@
 
 namespace  Mods\Theme\Compiler\Base;
 
-use Illuminate\Contracts\Container\Container;
+use Mods\Theme\Contracts\Compiler;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Container\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class Bundle
+abstract class Bundle implements Compiler
 {
     /**
      * The filesystem instance.
@@ -34,7 +35,6 @@ abstract class Bundle
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  string $basePath
      * @return void
      */
     public function __construct(Filesystem $files, Container $container)

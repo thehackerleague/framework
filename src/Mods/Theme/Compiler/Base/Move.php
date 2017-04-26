@@ -2,11 +2,12 @@
 
 namespace  Mods\Theme\Compiler\Base;
 
-use Illuminate\Contracts\Container\Container;
+use Mods\Theme\Contracts\Compiler;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Container\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class Move
+abstract class Move implements Compiler
 {
     /**
      * The filesystem instance.
@@ -34,7 +35,6 @@ abstract class Move
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  string $basePath
      * @return void
      */
     public function __construct(Filesystem $files, Container $container)
@@ -47,7 +47,7 @@ abstract class Move
     {
         extract($traveler);
 
-        if ($manifest['bundled']) {
+        if (!$this->canMove($manifest)) {
             return $pass($traveler);
         }
 
@@ -99,5 +99,16 @@ abstract class Move
             throw new \InvalidArgumentException('No Asset type given');
         }
         return $this->type;
+    }
+
+    /**
+     * Check if the assets can be moved.
+     *
+     * @param Array $manifest
+     * @return bool
+     */
+    protected function canMove($manifest)
+    {
+        return !$manifest['bundled'];
     }
 }

@@ -12,4 +12,15 @@ class Move extends BaseMove
      * @var string
      */
     protected $type = 'img';
+
+    /**
+     * Check if the assets can be moved.
+     *
+     * @param Array $manifest
+     * @return bool
+     */
+    protected function canMove($manifest)
+    {
+        return true;
+    }
 }

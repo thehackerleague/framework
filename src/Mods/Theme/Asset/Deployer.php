@@ -75,6 +75,7 @@ class Deployer extends Console
             $this->info("Deloying asset for {$area} section");
             $areaHints = $this->assetResolver->getHints($area, $module);
             $areaPaths = $this->assetResolver->getPaths($area, $theme);
+
             foreach ($areaPaths as $themekey => $locations) {
                 $this->info("  => Deloying asset for {$themekey} theme in {$area} section");
                 foreach ($areaHints as $namespace => $location) {
@@ -90,11 +91,11 @@ class Deployer extends Console
                 }
             }
 
+            $this->combineModuleAssests($area, $areaPaths);
+
             $this->info("Deloyed asset for {$area} section");
             $this->line("==============================================");
-            if (!$type || ($type && in_array($type, ['sass', 'less']))) {
-                $this->combineModuleAssests($area, $areaPaths);
-            }
+            
         }
         $this->writeConfig();
     }
@@ -123,15 +124,20 @@ class Deployer extends Console
     protected function combineModuleAssests($area, $areaPaths)
     {
         foreach ($areaPaths as $themekey => $locations) {
-            foreach (['sass' => 'scss', 'less' => 'less'] as $lang => $ext) {
+            foreach (['scss' => 'scss', 'less' => 'less'] as $lang => $ext) {
                 $themePath = formPath(
                     [$this->basePath, 'assets', $area, $themekey, $lang]
                 );
                 if ($this->files->exists($themePath)) {
                     $import = [];
-                    foreach (Finder::create()->files()->name('_module.'.$ext)->in([$themePath]) as $file) {
-                        $import[] = "@import '{$file->getRelativePathName()}' ";
+                    $files = Finder::create()->files()
+                        ->name('_theme.'.$ext)
+                        ->name('_module.'.$ext)
+                        ->in([$themePath]);   
+                    foreach ($files as $file) {
+                        $import[] = "@import \"{$file->getRelativePathName()}\";";
                     }
+                    $this->info("  => Combining `{$ext}` in `{$area}` area for `{$themekey}` theme.");
                     $this->writeThemeFiles($import, 'theme.'.$ext, $themePath);
                 }
             }
@@ -148,7 +154,7 @@ class Deployer extends Console
         $resourcePath = 'assets';
         foreach ($assetType as $type) {
             if ($this->files->copyDirectory(
-                formPath([$location, $type]),
+                formPath([$location, $area, $type]),
                 formPath([$this->basePath, $resourcePath, $area, $theme, $type, $namespace])
             )) {
                 $this->info("\t\t* Moving `{$type}`.");

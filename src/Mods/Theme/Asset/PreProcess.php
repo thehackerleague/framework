@@ -146,10 +146,12 @@ class PreProcess extends Console
     {
         $scripts = $this->prepareScripts($assets['js']);
         $styles = $this->prepareStyles($assets['css']);
+        $scss = $this->prepareScss($assets['scss']);
 
         return array_merge_recursive($manifest, [
             'js' => [$handle => $scripts],
-            'css' => [$handle => $styles]
+            'css' => [$handle => $styles],
+            'scss' => [$handle => $scss]
         ]);
     }
 
@@ -186,6 +188,22 @@ class PreProcess extends Console
         }
 
         return $css;
+    }
+
+    protected function prepareScss($scss)
+    {
+        $styles =  '<?xml version="1.0"?>'
+            . '<scss xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+            . $scss
+            . '</scss>';
+        $xml = simplexml_load_string($styles);
+        $scss = [];
+        foreach ($xml->scss as $style) {
+            $attributes = $style->attributes();
+            $scss[] = (string) $attributes->ref;
+        }
+
+        return $scss;
     }
 
     protected function writeConfig($manifest)
