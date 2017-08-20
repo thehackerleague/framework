@@ -115,16 +115,18 @@ class ModuleRepository
             }
         }
 
+
+        $notFoundModule = array_diff_key($activeModules, $manifest['modules']);
+        if (count($notFoundModule)) {
+            $word = (count($notFoundModule) > 1)?'Modules':'Module';
+            echo(implode(', ', $notFoundModule). " $word not Found");
+            exit(0);
+        }
+
         try {
             $manifest['relsoved'] = $moduleSorter->sort();
         } catch (ElementNotFoundException $e) {
             echo($e->getMessage());
-            exit(0);
-        }
-        $notFoundModule = array_diff($activeModules, $manifest['relsoved']);
-        if (count($notFoundModule)) {
-            $word = (count($notFoundModule) > 1)?'Modules':'Module';
-            echo(implode(', ', $notFoundModule). " $word not Found");
             exit(0);
         }
 
