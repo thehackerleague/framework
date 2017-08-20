@@ -38,4 +38,9 @@ class Theme
         }
         return null;
     }
+
+    public static function __set_state($anArray) // As of PHP 5.1.0
+    {
+        return new static($anArray['data']);
+    }
 }
