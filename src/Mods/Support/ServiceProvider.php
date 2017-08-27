@@ -25,7 +25,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
      * @param  string  $namespace
      * @return void
      */
-    protected function loadAssetsFrom($path, $namespace, $area = 'frontend')
+    protected function loadAssetsFrom($path, $namespace, $area = null)
     {
         $this->app['theme']->addAssetNamespace($namespace, $path, $area);
     }

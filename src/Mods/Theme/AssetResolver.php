@@ -144,7 +144,7 @@ class AssetResolver
      * @param  string  $hints
      * @return void
      */
-    public function addNamespace($namespace, $hints, $area = 'frontend')
+    public function addNamespace($namespace, $hints, $area)
     {
         /*$hints = (array) $hints;
 
@@ -152,7 +152,17 @@ class AssetResolver
             $hints = array_merge($this->hints[$area][$namespace], $hints);
         }*/
 
-        $this->hints[$area][$namespace] = $hints;
+        if($area === null) {
+            $area = 'frontend';
+        } 
+
+        if(is_array($area)) {
+            foreach ($area as $value) {
+                $this->hints[$value][$namespace] = $hints;
+            }            
+        } else {
+            $this->hints[$area][$namespace] = $hints;    
+        }
     }
 
     /**
