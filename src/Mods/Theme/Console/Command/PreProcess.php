@@ -32,16 +32,11 @@ class PreProcess extends Command
     public function fire()
     {
         $app = $this->getFreshAsset();
-        $area = null;
-        if ($this->hasOption('area')) {
-            $area = $this->option('area');
-        }
-        $theme = null;
-        if ($this->hasOption('theme')) {
-            $theme = $this->option('theme');
-        }
 
-        if ($area) {
+        $area = $this->option('area');
+        $theme = $this->option('theme');
+
+        if ($area != null) {
             $areas = [$area];
         } else {
             $areas = array_merge(['frontend'], array_values($app['config']->get('app.areas', [])));

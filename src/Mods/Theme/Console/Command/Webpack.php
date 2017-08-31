@@ -34,24 +34,17 @@ class Webpack extends Command
     public function fire()
     {
         $app = $this->getFreshAsset();
-        $area = null;
-        if ($this->hasOption('area')) {
-            $area = $this->option('area');
-        }
-        $theme = null;
-        if ($this->hasOption('theme')) {
-            $theme = $this->option('theme');
-        }
-        $module = null;
-        if ($this->hasOption('module')) {
-            $module = $this->option('module');
-        }
-        $type = null;
-        if ($this->hasOption('type')) {
-            $type = $this->option('type');
+        
+        $area = $this->option('area');
+        $theme = $this->option('theme');
+        $module = $this->option('module');
+        $type = $this->option('type');
+        
+        if($type != null) {
+            $type = explode(',', $type);        
         }
 
-        if ($area) {
+        if ($area != null) {
             $areas = [$area];
         } else {
             $areas = array_merge(['frontend'], array_values($app['config']->get('app.areas', [])));

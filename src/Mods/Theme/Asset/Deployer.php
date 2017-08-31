@@ -6,6 +6,7 @@ use Mods\Theme\AssetResolver;
 use Mods\Theme\ThemeResolver;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 
 class Deployer extends Console
@@ -39,6 +40,13 @@ class Deployer extends Console
     protected $config;
 
     /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $events;
+
+    /**
      * Resource location
      *
      * @var string
@@ -52,6 +60,7 @@ class Deployer extends Console
      * @param  \Mods\Theme\AssetResolver $assetResolver
      * @param  \Mods\Theme\ThemeResolver $themeResolver
      * @param  \Illuminate\Contracts\Config\Repository  $config
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  string $basePath
      * @return void
      */
@@ -60,12 +69,14 @@ class Deployer extends Console
         AssetResolver $assetResolver,
         ThemeResolver $themeResolver,
         ConfigContract $config,
+        Dispatcher $events,
         $basePath
     ) {
         $this->files = $files;
         $this->config = $config;
         $this->assetResolver = $assetResolver;
         $this->themeResolver = $themeResolver;
+        $this->events = $events;
         $this->basePath = $basePath;
     }
 
@@ -91,6 +102,8 @@ class Deployer extends Console
                 }
             }
 
+
+            $this->events->fire('theme.asset.deploy.after',compact('area', 'areaPaths', 'areaHints', 'type'));
             $this->combineModuleAssests($area, $areaPaths);
 
             $this->info("Deloyed asset for {$area} section");
@@ -144,12 +157,12 @@ class Deployer extends Console
         }
     }
 
-    protected function moveHintAsset($namespace, $location, $area, $theme, $type)
+    protected function moveHintAsset($namespace, $location, $area, $theme, $inputType)
     {
         $this->info("\t* Deploying files from `{$namespace}` module.");
         $assetType = $this->config->get('theme.asset', []);
-        if ($type) {
-            $assetType = array_intersect($assetType, [$type]);
+        if ($inputType) {
+            $assetType = array_intersect($assetType, $inputType);
         }
         $resourcePath = 'assets';
         foreach ($assetType as $type) {
@@ -164,12 +177,12 @@ class Deployer extends Console
         }
     }
 
-    protected function movePathAsset($location, $area, $theme, $type)
+    protected function movePathAsset($location, $area, $theme, $inputType)
     {
         $this->info("\t* Deploying files from `{$location}` location.");
         $assetType = $this->config->get('theme.asset', []);
-        if ($type) {
-            $assetType = array_intersect($assetType, [$type]);
+        if ($inputType) {
+            $assetType = array_intersect($assetType, $inputType);
         }
         $resourcePath = 'assets';
         foreach ($assetType as $type) {

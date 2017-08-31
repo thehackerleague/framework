@@ -1,6 +1,6 @@
 <?php
 
-namespace  Mods\Theme\Compiler\File;
+namespace  Mods\Theme\Compiler\Font;
 
 use Mods\Theme\Compiler\Base\Move as BaseMove;
 
@@ -11,7 +11,7 @@ class Move extends BaseMove
      *
      * @var string
      */
-    protected $type = 'img';
+    protected $type = 'fonts';
 
     /**
      * Check if the assets can be moved.

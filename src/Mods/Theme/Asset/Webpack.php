@@ -4,6 +4,7 @@ namespace  Mods\Theme\Asset;
 
 use Mods\Theme\AssetResolver;
 use Mods\Theme\ThemeResolver;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
@@ -114,6 +115,7 @@ class Webpack extends Console
                 }
             }
         } catch (FileNotFoundException $e) {
+            Log::debug($e);
             $this->console->error("Unexpectedly something went wrong during deployment.");
         }
     }

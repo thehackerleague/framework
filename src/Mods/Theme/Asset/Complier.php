@@ -4,6 +4,7 @@ namespace  Mods\Theme\Asset;
 
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Illuminate\Support\Facades\Log;
 use Mods\Theme\Compiler\Factory;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
@@ -48,7 +49,7 @@ class Complier extends Console
         $this->basePath = $basePath;
     }
 
-    public function compile($areas, $theme = null, $module = null, $type = null)
+    public function compile($areas, $theme = null, $module = null, $inputType = null)
     {
         $metadata = json_decode($this->readConfig(), true);
         $areas = array_intersect_key($metadata['areas'], array_flip($areas));
@@ -58,14 +59,15 @@ class Complier extends Console
                     $themes = array_intersect_key($themes, [$theme => 1]);
                 }
                 foreach ($themes as $key => $assets) {
-                    if ($type) {
-                        $assets = array_intersect_key($assets, [$type => 1]);
+                    if ($inputType) {
+                        $assets = array_intersect_key($assets, array_flip($inputType));
                     }
                     $manifest = $this->compiler->handle($area, $key, $assets, $this->console);
                     $this->writeManifest($manifest, $area, $key);
                 }
             }
         } catch (FileNotFoundException $e) {
+            Log::debug($e);
             $this->console->error("Unexpectedly something went wrong during deployment.");
         }
     }

@@ -90,6 +90,7 @@ class ThemeServiceProvider extends ServiceProvider
                 $app['theme.asset.resolver'],
                 $app['theme.resolver'],
                 $app['config'],
+                $app['events'],
                 $app['path.resources']
             );
         });

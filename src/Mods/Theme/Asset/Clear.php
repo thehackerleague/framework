@@ -113,12 +113,12 @@ class Clear extends Console
         $this->line("==============================================");
     }
 
-    protected function clearHintAsset($namespace, $area, $theme, $type, $clearPublic)
+    protected function clearHintAsset($namespace, $area, $theme, $inputType, $clearPublic)
     {
         $this->info("\t* Clearing files from `{$area}` ==> `{$theme}` ==> `{$namespace}`  module.");
         $assetType = $this->config->get('theme.asset', []);
-        if ($type) {
-            $assetType = array_intersect($assetType, [$type]);
+        if ($inputType) {
+            $assetType = array_intersect($assetType, $inputType);
         }
         foreach ($assetType as $type) {
             $this->info("\t\t* Clearing `{$type}`.");
@@ -133,7 +133,7 @@ class Clear extends Console
         }
     }
 
-    protected function clearPathAsset($area, $theme, $type, $clearPublic)
+    protected function clearPathAsset($area, $theme, $inputType, $clearPublic)
     {
         $this->info("\t* Clearing files from `{$area}` ==> `{$theme}` location.");
         $basePath = [
@@ -142,11 +142,22 @@ class Clear extends Console
         $publicPath = [
             $this->publicPath, 'assets', $area, $theme
         ];
-        if ($type) {
-            $basePath[] = $type;
-            $publicPath[] = $type;
-            $this->info("\t\t* Clearing `{$type}`.");
+        if ($inputType) {
+
+            foreach ($inputType as $type) {
+               $basePath[] = $type;
+               $publicPath[] = $type;
+               $this->info("\t\t* Clearing `{$type}`.");
+               $this->cleanDirectoryFor($clearPublic, $basePath, $publicPath);
+            }
+            
         }
+
+        $this->cleanDirectoryFor($clearPublic, $basePath, $publicPath);
+        
+    }
+
+    private function cleanDirectoryFor($clearPublic, $basePath, $publicPath) {
         $this->files->cleanDirectory(formPath($basePath));
         if ($clearPublic) {
             $this->files->cleanDirectory(formPath($publicPath));
