@@ -12,31 +12,75 @@ abstract class Console
         return $this;
     }
 
-    protected function info($msg)
+     /**
+     * Write a string as information output.
+     *
+     * @param  string  $string
+     * @param  null|int|string  $verbosity
+     * @return void
+     */
+    protected function info($string, $verbosity = null)
     {
         if ($this->console) {
-            $this->console->info($msg);
+            $this->console->info($string);
         }
     }
 
-    protected function warn($msg)
+    /**
+     * Write a string as warning output.
+     *
+     * @param  string  $string
+     * @param  null|int|string  $verbosity
+     * @return void
+     */
+    protected function warn($string, $verbosity = null)
     {
         if ($this->console) {
-            $this->console->warn($msg);
+            $this->console->warn($string);
         }
     }
 
-    protected function error($msg)
+    /**
+     * Write a string as error output.
+     *
+     * @param  string  $string
+     * @param  null|int|string  $verbosity
+     * @return void
+     */
+    protected function error($string, $verbosity = null)
     {
         if ($this->console) {
-            $this->console->error($msg);
+            $this->console->error($string);
         }
     }
 
-    protected function line($msg)
+    /**
+     * Write a string as standard output.
+     *
+     * @param  string  $string
+     * @param  string  $style
+     * @param  null|int|string  $verbosity
+     * @return void
+     */
+    protected function line($string, $style = null, $verbosity = null)
     {
         if ($this->console) {
-            $this->console->line($msg);
+            $this->console->line($string);
+        }
+    }
+
+    /**
+     * Format input to textual table.
+     *
+     * @param  array   $headers
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
+     * @param  string  $style
+     * @return void
+     */
+    protected function table(array $headers, $rows, $style = 'default')
+    {
+        if ($this->console) {
+            $this->console->table($headers, $rows, $style);
         }
     }
 }

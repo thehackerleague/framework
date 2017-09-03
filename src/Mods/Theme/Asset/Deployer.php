@@ -5,7 +5,6 @@ namespace  Mods\Theme\Asset;
 use Mods\Theme\AssetResolver;
 use Mods\Theme\ThemeResolver;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 
@@ -103,8 +102,10 @@ class Deployer extends Console
             }
 
 
-            $this->events->fire('theme.asset.deploy.after',compact('area', 'areaPaths', 'areaHints', 'type'));
-            $this->combineModuleAssests($area, $areaPaths);
+            $response = $this->events->fire('theme.asset.deploy.after', compact('area', 'areaPaths', 'areaHints', 'type'));
+
+            $this->table(['Asset Deploy After Event'], $response);
+            
 
             $this->info("Deloyed asset for {$area} section");
             $this->line("==============================================");
@@ -134,29 +135,6 @@ class Deployer extends Console
         );
     }
 
-    protected function combineModuleAssests($area, $areaPaths)
-    {
-        foreach ($areaPaths as $themekey => $locations) {
-            foreach (['scss' => 'scss', 'less' => 'less'] as $lang => $ext) {
-                $themePath = formPath(
-                    [$this->basePath, 'assets', $area, $themekey, $lang]
-                );
-                if ($this->files->exists($themePath)) {
-                    $import = [];
-                    $files = Finder::create()->files()
-                        ->name('_theme.'.$ext)
-                        ->name('_module.'.$ext)
-                        ->in([$themePath]);   
-                    foreach ($files as $file) {
-                        $import[] = "@import \"{$file->getRelativePathName()}\";";
-                    }
-                    $this->info("  => Combining `{$ext}` in `{$area}` area for `{$themekey}` theme.");
-                    $this->writeThemeFiles($import, 'theme.'.$ext, $themePath);
-                }
-            }
-        }
-    }
-
     protected function moveHintAsset($namespace, $location, $area, $theme, $inputType)
     {
         $this->info("\t* Deploying files from `{$namespace}` module.");
@@ -172,7 +150,7 @@ class Deployer extends Console
             )) {
                 $this->info("\t\t* Moving `{$type}`.");
             } else {
-                $this->warn("\t\t* `{$type}` files not found.");
+                $this->warn("\t\t* `{$type}` not found.");
             }
         }
     }
@@ -195,12 +173,5 @@ class Deployer extends Console
                 $this->warn("\t\t* `{$type}` not found.");
             }
         }
-    }
-
-    protected function writeThemeFiles($content, $name, $path)
-    {
-        $this->files->put(
-            $path.'/'.$name, implode(PHP_EOL, $content)
-        );
     }
 }

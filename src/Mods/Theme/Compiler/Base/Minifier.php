@@ -121,10 +121,11 @@ abstract class Minifier implements Compiler
     protected function processedMinfier($asset, $area, $theme, $console)
     {
         foreach ($asset as $handle => $contents) {
+            $contents = $this->parseContents($contents);
             foreach ($contents as $key => $content) {
                 $origin = formPath([
                     $this->container['path.resources'], 'assets', $area, $theme,
-                    $this->getType(), str_replace('%baseurl', '', $content)
+                    $this->getType(), $content
                 ]);
 
                 $destination = str_replace(
@@ -164,6 +165,14 @@ abstract class Minifier implements Compiler
      * @return string
      */
     abstract protected function minify($content);
+
+    /**
+     * Parse the given string of asset to get the asset links
+     *
+     * @param string $contents
+     * @return array
+     */
+    abstract protected function parseContents($contents);
 
     /**
      * Get the type of asset need to be processed.

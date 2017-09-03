@@ -76,7 +76,7 @@ class PreProcess extends Console
         $this->basePath = $this->application['path.resources'];
     }
 
-    public function process($areas, $theme = null)
+    public function process($areas, $inputTheme = null)
     {
         $manifest = [];
         $oldArea = $this->application['area'];
@@ -88,15 +88,15 @@ class PreProcess extends Console
             $this->info("Pre Processing for {$area} section.");
             $manifest[$area] = [];
             $this->application['area'] = $area;
-            $handles = $pageUpdates->collectHandlesFromUpdates();
+            $handles = $pageUpdates->resetHandle()->collectHandlesFromUpdates();
             $currentTheme = $this->themeResolver->getActive($area);
             $themes = $this->themeResolver->themeCollection($area);
-            $themes = $themes->only($theme);
-            foreach ($themes as $key => $theme) {
-                $this->info("  => Moking app for {$key} theme in {$area} section");
-                $manifest[$area][$key] = [];
-                $this->mockApplicationTheme($area, $key, $currentTheme);
-                $currentTheme = $key;
+            $themes = $themes->only($inputTheme);
+            foreach ($themes as $themeName => $theme) {
+                $this->info("  => Moking app for {$themeName} theme in {$area} section");
+                $manifest[$area][$themeName] = [];
+                $this->mockApplicationTheme($area, $themeName, $currentTheme);
+                $currentTheme = $themeName;
                 foreach ($handles as $handle) {
                     if ($handle == 'default') {
                         continue;
@@ -106,10 +106,10 @@ class PreProcess extends Console
                         ->addHandle('default')
                         ->addHandle($handle)
                         ->buildLayout();
-                    $manifest[$area][$key] = $this->prepareAsset(
+                    $manifest[$area][$themeName] = $this->prepareAsset(
                         $page->getLayout()->generateHeadElemets(),
                         $handle,
-                        $manifest[$area][$key]
+                        $manifest[$area][$themeName]
                     );
                     $manifest['handles'][$area][] = $handle;
                 }
@@ -118,14 +118,13 @@ class PreProcess extends Console
             $this->info("Pre Processing for {$area} section done.");
             $this->line("==============================================");
         }
-
         $this->writeConfig($manifest);
 
         $this->application['area'] = $oldArea;
         $this->config->set('layout.xml_location', $oldLayoutXmlLocation);
     }
 
-    protected function mockApplicationTheme($area, $themeKey, $currentTheme)
+    protected function mockApplicationTheme($area, $themeName, $currentTheme)
     {
         $locations = $this->config->get('layout.xml_location.'.$area);
         $currentPaths = $this->themeResolver->getPaths($area, $currentTheme)->toArray();
@@ -133,7 +132,7 @@ class PreProcess extends Console
         foreach ($currentPaths as $path) {
             unset($locations[md5($path.'/layouts/')]);
         }
-        $paths = $this->themeResolver->getPaths($area, $themeKey)->toArray();
+        $paths = $this->themeResolver->getPaths($area, $themeName)->toArray();
         foreach ($paths as $path) {
             if (is_dir($appPath = $path.'/layouts/')) {
                 $locations[md5($appPath)] = $appPath;
@@ -144,15 +143,11 @@ class PreProcess extends Console
 
     protected function prepareAsset($assets, $handle, $manifest)
     {
-        $scripts = $this->prepareScripts($assets['js']);
-        $styles = $this->prepareStyles($assets['css']);
-        $scss = $this->prepareScss($assets['scss']);
-
-        return array_merge_recursive($manifest, [
-            'js' => [$handle => $scripts],
-            'css' => [$handle => $styles],
-            'scss' => [$handle => $scss]
-        ]);
+        $tempArray = [];
+        foreach ($assets as $type => $asset) {
+             $tempArray[$type] = [$handle => $asset];
+        }
+        return array_merge_recursive($manifest, $tempArray);
     }
 
     protected function prepareScripts($scripts)

@@ -33,6 +33,10 @@ class ThemeServiceProvider extends ServiceProvider
     {
         $this->registerThemeDeployer();
 
+        $this->app->register(
+            'Mods\Theme\EventServiceProvider'
+        );
+
         $this->app->singleton('theme.asset.resolver', function ($app) {
             return new AssetResolver($app['files']);
         });

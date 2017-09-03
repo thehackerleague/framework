@@ -57,7 +57,7 @@ class Webpack extends Command
         $complier = $app['theme.complier']->setConsole($this);
         $preprocessor = $app['theme.preprocessor']->setConsole($this);
 
-        $clear->clear($areas, $theme, $module, $type, true, true);
+        $clear->clear($areas, $theme, $module, $type, true);
         $deployer->deploy($areas, $theme, $module, $type);
         $preprocessor->process($areas, $theme);
         $complier->compile($areas, $theme, $module, 'img');

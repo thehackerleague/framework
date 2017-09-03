@@ -65,10 +65,6 @@ class Compile extends Command
             $deployer->deploy($areas, $theme, $module, $type);
             
             if (!$this->option('simple')) {
-                if ($this->option('bundle')) {
-                    $clear->bundled();
-                    $this->line("==============================================");
-                }
                 $preprocessor->process($areas, $theme);
             }
         }

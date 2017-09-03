@@ -51,7 +51,8 @@ abstract class Bundle implements Compiler
             return $pass($traveler);
         }
         $basePaths = [
-            $this->container['path.public'], 'assets', 'bundle'
+            $this->container['path.public'], 'assets', $area,
+            $theme, $this->getType(), 'bundle'
         ];
         $destination = formPath($basePaths);
         if (!$this->files->isDirectory($destination)) {
@@ -61,11 +62,22 @@ abstract class Bundle implements Compiler
             $filename = md5($area.$theme.$handle);
             $destination = formPath(array_merge($basePaths, ["$filename.{$this->getType()}"]));
             $this->files->put($destination, '');
-            foreach ($contents as $key => $content) {
+
+            $contents = $this->parseContents($contents);
+
+            foreach ($contents as $content) {
+
+                if ($console->option('minify')) { 
+                    $content = str_replace(
+                        '.'.$this->getType(), '.min.'.$this->getType(),
+                        $content
+                    );
+                }
+                
                 $origin = formPath([
                     $this->container['path.resources'], 'assets', $area,
                     $theme, $this->getType(),
-                    str_replace('%baseurl', '', $content)
+                    $content
                 ]);
 
                 if ($this->files->append(
@@ -83,6 +95,14 @@ abstract class Bundle implements Compiler
         $traveler['manifest']['bundled'] = true;
         return $pass($traveler);
     }
+
+    /**
+     * Parse the given string of asset to get the asset links
+     *
+     * @param string $contents
+     * @return array
+     */
+    abstract protected function parseContents($contents);
 
     /**
      * Get the type of asset need to be processed.

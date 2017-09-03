@@ -72,11 +72,8 @@ class Clear extends Console
 
     public function clear(
         $areas, $theme = null, $module = null,
-        $type = null, $clearPublic = false, $clearBundled = false
+        $type = null, $clearPublic = false
     ) {
-        if ($clearBundled) {
-            $this->bundled();
-        }
         foreach ($areas as $area) {
             $this->info("Preparing {$area} section.");
             if (!$theme && !$module) {
@@ -162,13 +159,5 @@ class Clear extends Console
         if ($clearPublic) {
             $this->files->cleanDirectory(formPath($publicPath));
         }
-    }
-
-    public function bundled()
-    {
-        $this->info("Clearing bundled assets.");
-        $this->files->cleanDirectory(formPath([
-            $this->publicPath, 'assets', 'bundle'
-        ]));
     }
 }
