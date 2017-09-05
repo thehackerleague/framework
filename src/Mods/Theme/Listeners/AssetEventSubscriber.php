@@ -63,10 +63,33 @@ class AssetEventSubscriber
 
     	if(empty($type) || in_array('css', $type)) {
 	    	$this->combineModuleAssests($area, $areaPaths);
-	    	$this->combineFonts($area, $areaPaths, $areaHints);
+	    	//$this->combineFonts($area, $areaPaths, $areaHints);
+            $this->patchFonts($area, $areaPaths, $areaHints);
 	    }
 
     	return [$this->response];
+    }
+
+    protected function patchFonts($area, $areaPaths, $areaHints)
+    {
+        foreach ($areaPaths as $themekey => $locations) {
+
+            $themePath = formPath(
+                [$this->basePath, 'assets', $area, $themekey, 'css']
+            );
+
+             $files = Finder::create()->files()
+                        ->name('*.css')
+                        ->contains('@{baseurl}')
+                        ->in([$themePath]);   
+
+            foreach ($files as $file) {
+                $realPath = $file->getRealPath();
+                $this->files->put($file->getRealPath(),str_replace('@{baseurl}',"/assets/$area/$themekey/", $file->getContents()));
+            }
+
+            $this->response .="  => Patching Fonts...\n";
+        }
     }
 
     protected function combineFonts($area, $areaPaths, $areaHints)

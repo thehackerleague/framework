@@ -68,7 +68,7 @@ class Complier extends Console
             }
         } catch (FileNotFoundException $e) {
             Log::debug($e);
-            $this->console->error("Unexpectedly something went wrong during deployment.");
+            $this->console->error("Unexpectedly something went wrong during deployment, CHECK LOG...");
         }
     }
 
