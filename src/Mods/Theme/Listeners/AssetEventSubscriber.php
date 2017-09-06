@@ -64,13 +64,13 @@ class AssetEventSubscriber
     	if(empty($type) || in_array('css', $type)) {
 	    	$this->combineModuleAssests($area, $areaPaths);
 	    	//$this->combineFonts($area, $areaPaths, $areaHints);
-            $this->patchFonts($area, $areaPaths, $areaHints);
+            $this->patchBaseUrl($area, $areaPaths, $areaHints);
 	    }
 
     	return [$this->response];
     }
 
-    protected function patchFonts($area, $areaPaths, $areaHints)
+    protected function patchBaseUrl($area, $areaPaths, $areaHints)
     {
         foreach ($areaPaths as $themekey => $locations) {
 
@@ -88,7 +88,7 @@ class AssetEventSubscriber
                 $this->files->put($file->getRealPath(),str_replace('@{baseurl}',"/assets/$area/$themekey/", $file->getContents()));
             }
 
-            $this->response .="  => Patching Fonts...\n";
+            $this->response .="  => Patching Base-Url...\n";
         }
     }
 
