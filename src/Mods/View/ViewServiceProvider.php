@@ -13,16 +13,16 @@ class ViewServiceProvider extends ServiceProvider
 
     public function registerLayoutBinder()
     {
-        $this->app->bind('\Layout\Core\Contracts\Cacheable', function ($app) {
+        $this->app->bind(\Layout\Core\Contracts\Cacheable::class, function ($app) {
             return $app['layout.cache'];
         });
-        $this->app->bind('\Layout\Core\Contracts\EventsDispatcher', function ($app) {
+        $this->app->bind(\Layout\Core\Contracts\EventsDispatcher::class, function ($app) {
             return $app['layout.event'];
         });
-        $this->app->bind('\Layout\Core\Contracts\ConfigResolver', function ($app) {
+        $this->app->bind(\Layout\Core\Contracts\ConfigResolver::class, function ($app) {
             return $app['layout.config'];
         });
-        $this->app->bind('\Layout\Core\Contracts\Profiler', function ($app) {
+        $this->app->bind(\Layout\Core\Contracts\Profiler::class, function ($app) {
             return $app['layout.profile'];
         });
 

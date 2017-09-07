@@ -15,10 +15,10 @@
         }
     ],
     "require": {
-        "laravel/framework": "5.3.*",
+        "laravel/framework": "5.4.*",
         "sunel/layout-core": "0.0.*",
-        "marcj/topsort": "1.0.0",
-        "tubalmartin/cssmin": "^2.4",
+        "marcj/topsort": "1.1.*",
+        "tubalmartin/cssmin": "4.1.*",
         "tedivm/jshrink": "^1.1"
     },
     "autoload": {

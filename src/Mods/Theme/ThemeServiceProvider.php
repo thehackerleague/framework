@@ -19,7 +19,7 @@ class ThemeServiceProvider extends ServiceProvider
     {
         Blade::directive('asset_img', function ($expression) {
             $area = app()->area();
-            $theme = app('Mods\Theme\Factory')->getActiveTheme($area);
+            $theme = app(Mods\Theme\Factory::class)->getActiveTheme($area);
             return asset("assets/{$area}/{$theme}/img/{$expression}");
         });
     }
@@ -34,7 +34,7 @@ class ThemeServiceProvider extends ServiceProvider
         $this->registerThemeDeployer();
 
         $this->app->register(
-            'Mods\Theme\EventServiceProvider'
+            \Mods\Theme\EventServiceProvider::class
         );
 
         $this->app->singleton('theme.asset.resolver', function ($app) {

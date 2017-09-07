@@ -21,6 +21,6 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $subscribe = [
-        'Mods\Theme\Listeners\AssetEventSubscriber',
+        \Mods\Theme\Listeners\AssetEventSubscriber::class,
     ];
 }
