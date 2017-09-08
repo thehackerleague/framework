@@ -32,7 +32,7 @@ class Clear extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $app = $this->getFreshAsset();
         

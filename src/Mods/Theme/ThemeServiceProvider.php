@@ -19,7 +19,7 @@ class ThemeServiceProvider extends ServiceProvider
     {
         Blade::directive('asset_img', function ($expression) {
             $area = app()->area();
-            $theme = app(Mods\Theme\Factory::class)->getActiveTheme($area);
+            $theme = app(\Mods\Theme\Factory::class)->getActiveTheme($area);
             return asset("assets/{$area}/{$theme}/img/{$expression}");
         });
     }
