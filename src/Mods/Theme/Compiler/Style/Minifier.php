@@ -2,6 +2,7 @@
 
 namespace  Mods\Theme\Compiler\Style;
 
+use tubalmartin\CssMin\Minifier as CSSmin;
 use Mods\Theme\Compiler\Base\Minifier as BaseMinifier;
 
 class Minifier extends BaseMinifier
@@ -20,7 +21,7 @@ class Minifier extends BaseMinifier
      */
     protected function canMinify()
     {
-        if (!class_exists('CSSmin')) {
+        if (!class_exists('tubalmartin\CssMin\Minifier')) {
             return "`CSSmin` is not found \n composer require tubalmartin/cssmin";
         }
         return true;
@@ -34,7 +35,7 @@ class Minifier extends BaseMinifier
      */
     protected function minify($content)
     {
-        $compressor = new \CSSmin();
+        $compressor = new CSSmin();
         return $compressor->run($content);
     }
 
