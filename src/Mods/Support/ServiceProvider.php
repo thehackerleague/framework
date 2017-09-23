@@ -29,4 +29,19 @@ abstract class ServiceProvider extends LaravelServiceProvider
     {
         $this->app['theme']->addAssetNamespace($namespace, $path, $area);
     }
+
+
+    /**
+     * Merge the given configuration recursivly with the existing configuration.
+     *
+     * @param  string  $path
+     * @param  string  $key
+     * @return void
+     */
+    protected function mergeRecursiveConfigFrom($path, $key)
+    {
+        $config = $this->app['config']->get($key, []);
+
+        $this->app['config']->set($key, array_merge_recursive(require $path, $config));
+    }
 }
