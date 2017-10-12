@@ -41,6 +41,24 @@ class Factory
     }
 
     /**
+     * Add a piece of data to the view.
+     *
+     * @param  string|array  $key
+     * @param  mixed   $value
+     * @return $this
+     */
+    public function with($key, $value = null)
+    {
+        if (is_array($key)) {
+            view()->share($key);
+        } else {
+           view()->share($key,  $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the page factory
      *
      * @return  \Layout\Core\Factory
