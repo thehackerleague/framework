@@ -64,6 +64,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'QueueTable' => 'command.queue.table',
         'SessionTable' => 'command.session.table',
         'Serve' => 'command.serve',
+        'MigrateMake' => 'command.migrate.make',
     ];
 
 }
