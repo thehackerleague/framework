@@ -19,7 +19,8 @@
         "sunel/layout-core": "0.0.*",
         "marcj/topsort": "1.1.*",
         "tubalmartin/cssmin": "4.1.*",
-        "tedivm/jshrink": "^1.1"
+        "tedivm/jshrink": "^1.1",
+        "laracasts/flash": "^3.0"
     },
     "autoload": {
         "files": [

@@ -5,7 +5,8 @@ return [
         'name' => 'View',
         'type' => 'module',
         'providers' => [
-            Mods\View\ViewServiceProvider::class
+            Mods\View\ViewServiceProvider::class,
+            Laracasts\Flash\FlashServiceProvider::class
         ],
         'aliases' => [
         ],

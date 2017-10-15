@@ -3,9 +3,29 @@
 namespace Mods\View;
 
 use Mods\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 
 class ViewServiceProvider extends ServiceProvider
 {
+    /**
+     * Perform post-registration booting of services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $directives = require __DIR__.'/directives.php';
+
+        collect($directives)->each(function ($item, $key) {
+            Blade::directive($key, $item);
+        });
+    }
+
+    /**
+     * Register bindings in the container.
+     *
+     * @return void
+     */
     public function register()
     {
         $this->registerLayoutBinder();

@@ -27,3 +27,32 @@ if (! function_exists('render')) {
         return app(Mods\View\Factory::class)->render();
     }
 }
+
+
+if (! function_exists('parseMultipleArgs')) {
+    /**
+     * Parse expression.
+     *
+     * @param  string $expression
+     * @return \Illuminate\Support\Collection
+     */
+    function parseMultipleArgs($expression)
+    {
+        return collect(explode(',', $expression))->map(function ($item) {
+            return trim($item);
+        });
+    }
+}
+
+if (! function_exists('stripQuotes')) {
+    /**
+     * Strip single quotes.
+     *
+     * @param  string $expression
+     * @return string
+     */
+    function stripQuotes($expression)
+    {
+        return str_replace("'", '', $expression);
+    }
+}
