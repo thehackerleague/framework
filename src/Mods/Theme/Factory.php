@@ -43,7 +43,7 @@ class Factory
 
     protected static $layoutXmlLocation = [];
 
-    protected static $assetLocation = [];
+    protected static $themeTemplatePath = [];
 
     /**
      * Create a new view factory instance.
@@ -116,6 +116,10 @@ class Factory
             }
             $paths = $this->themeResolver->getPaths($area)->toArray();
             foreach ($paths as $path) {
+                if (is_dir($appPath = $path.'/templates/') && !isset(static::$themeTemplatePath[md5($appPath)])) {
+                    $this->view->addNamespace($area, $appPath);
+                    static::$themeTemplatePath[md5($appPath)] = $appPath;
+                }
                 if (is_dir($appPath = $path.'/templates/'.$namespace)) {
                     $this->view->addNamespace($areaNamespace, $appPath);
                 }
@@ -138,6 +142,8 @@ class Factory
         if ($app['config']->get('deploying', false)) {
             $this->registerAsset($app);
         }
+        static::$layoutXmlLocation = static::$themeTemplatePath = [];
+
     }
 
     protected function registerLayoutXml($app)
