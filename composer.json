@@ -20,7 +20,8 @@
         "marcj/topsort": "1.1.*",
         "tubalmartin/cssmin": "4.1.*",
         "tedivm/jshrink": "^1.1",
-        "laracasts/flash": "^3.0"
+        "laracasts/flash": "^3.0",
+        "mods/form":"*"
     },
     "autoload": {
         "files": [

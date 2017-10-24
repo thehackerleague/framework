@@ -19,7 +19,8 @@
         "illuminate/events": "5.5.*",
         "illuminate/cache": "5.5.*",
         "illuminate/config": "5.5.*",
-        "laracasts/flash": "^3.0"
+        "laracasts/flash": "^3.0",
+        "mods/form":"*"
     },
     "autoload": {
         "files": [
