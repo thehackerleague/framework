@@ -44,4 +44,49 @@ abstract class ServiceProvider extends LaravelServiceProvider
 
         $this->app['config']->set($key, array_merge_recursive(require $path, $config));
     }
+
+    /**
+     * Register a advice for before.
+     *
+     * @param  string $id
+     * @param  string $target
+     * @param  string|callable  $macro
+     * @param  int $sortOrder
+     *
+     * @return void
+     */
+    protected function registerBeforeAdvice($id, $target, $macro, $sortOrder = 10)
+    {
+        $this->app['aspect']->before($id, $target, $macro, $sortOrder);
+    }
+
+    /**
+     * Register a advice for around.
+     *
+     * @param  string $id
+     * @param  string $target
+     * @param  string|callable  $macro
+     * @param  int $sortOrder
+     *
+     * @return void
+     */
+    protected function registerAroundAdvice($id, $target, $macro, $sortOrder = 10)
+    {
+        $this->app['aspect']->around($id, $target, $macro, $sortOrder);
+    }
+
+    /**
+     * Register a advice for after.
+     *
+     * @param  string $id
+     * @param  string $target
+     * @param  string|callable  $macro
+     * @param  int $sortOrder
+     *
+     * @return void
+     */
+    protected function registerAfterAdvice($id, $target, $macro, $sortOrder = 10)
+    {
+        $this->app['aspect']->after($id, $target, $macro, $sortOrder);
+    }
 }

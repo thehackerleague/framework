@@ -117,8 +117,8 @@ class ModuleRepository
 
 
         $notFoundModule = array_diff_key($activeModules, $manifest['modules']);
-        if (count($notFoundModule)) {
-            $word = (count($notFoundModule) > 1)?'Modules':'Module';
+        if ($notFoundModuleCount = count($notFoundModule)) {
+            $word = ($notFoundModuleCount > 1)?'Modules':'Module';
             echo(implode(', ', $notFoundModule). " $word not Found");
             exit(0);
         }

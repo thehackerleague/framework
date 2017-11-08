@@ -21,6 +21,7 @@
         "tubalmartin/cssmin": "4.1.*",
         "tedivm/jshrink": "^1.1",
         "laracasts/flash": "^3.0",
+        "zendframework/zend-code":"3.3.*",
         "mods/form":"*"
     },
     "autoload": {
