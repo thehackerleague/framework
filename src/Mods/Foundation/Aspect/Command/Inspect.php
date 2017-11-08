@@ -256,7 +256,7 @@ class Inspect extends Command
      */
     protected function saveGeneratedCode($namespace, $fileName, $code)
     {
-        $directory = 'generated/classes/'.ltrim(str_replace(['\\', '_'], '/', $namespace), '/');
+        $directory = 'generated/'.ltrim(str_replace(['\\', '_'], '/', $namespace), '/');
         if($this->laravel['files']->makeDirectory(resource_path($directory), 0755, true, true)) {
             if($this->laravel['files']->put(resource_path($directory.'/'.$fileName.'.php'), $code) !==  false) {
                 return true;
@@ -273,6 +273,8 @@ class Inspect extends Command
      */
     protected function cleanDirectory()
     {
-        $this->laravel['files']->cleanDirectory(resource_path('generated/classes/'));
+        $gitignore = $this->laravel['files']->get(resource_path('generated/.gitignore'));
+        $this->laravel['files']->cleanDirectory(resource_path('generated/'));
+        $this->laravel['files']->put(resource_path('generated/.gitignore'), $gitignore);
     }
 }
