@@ -35,7 +35,7 @@ class Form extends BaseBlock
 	*/
 	protected function boot()
     {
-       $this->setTemplate('form');
+       $this->setTemplate('form.wrapper');
     }
 
 
@@ -44,9 +44,15 @@ class Form extends BaseBlock
 	*/
     protected function _beforeToHtml()
     {   
-        $this->formInstance = app($this->form);
+        $this->formInstance = app()->make($this->form);
 
-        $this->assign($this->formInstance->build());
+        $this->assign('form', 
+            $this->getLayout()
+                ->createBlock(EmptyBlock::class, 'form.elements')
+                ->setTemplate('form.elements')
+                ->assign($this->formInstance->build())
+                ->toHtml()
+        );
 
         return $this;
     }
