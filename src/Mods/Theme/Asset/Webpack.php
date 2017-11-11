@@ -5,10 +5,11 @@ namespace  Mods\Theme\Asset;
 use Mods\Theme\AssetResolver;
 use Mods\Theme\ThemeResolver;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Illuminate\Contracts\Config\Repository as ConfigContract;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\Console\Output\OutputInterface;
+use Illuminate\Contracts\Config\Repository as ConfigContract;
 
 class Webpack extends Console
 {
@@ -48,10 +49,19 @@ class Webpack extends Console
      */
     protected $publicPath;
 
+
+    /**
+     * The application implementation.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+
     /**
      * Create a new config cache command instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @param  \Illuminate\Filesystem\Filesystem  $files     
      * @param  \Mods\Theme\AssetResolver $assetResolver
      * @param  \Illuminate\Contracts\Config\Repository $config
      * @param  string $basePath
@@ -59,12 +69,14 @@ class Webpack extends Console
      * @return void
      */
     public function __construct(
+        Application $app,
         Filesystem $files,
         AssetResolver $assetResolver,
         ConfigContract $config,
         $basePath,
         $publicPath
     ) {
+        $this->app = $app;
         $this->files = $files;
         $this->config = $config;
         $this->assetResolver = $assetResolver;
@@ -87,12 +99,11 @@ class Webpack extends Console
                     foreach ($handles[$area] as $handle) {
                         $collection = [];
                         foreach ($aAssets as $type) {
-                            if(!isset($assets[$type]) || !is_array($assets[$type])) { continue; }
-                            $basePath = formPath([$this->basePath, 'assets', $area, $key, $type]);
-                            $mutatedValue = array_map(function ($val) use ($basePath) {
-                                $fullPath = formPath([$basePath, str_replace('%baseurl', '', $val)]);
+                            //if(!isset($assets[$type]) || !is_array($assets[$type])) { continue; }
+                            $mutatedValue = array_map(function ($url) use ($area, $key, $type) {
+                                $fullPath = formPath(['themePath', $area, $key, $type, $url], '/');
                                 return "require('$fullPath')";
-                            }, $assets[$type][$handle]);
+                            }, $this->getAssetPath($type, $assets[$type][$handle]));
                             $collection = array_merge($collection, $mutatedValue);
                         }
                         $destination = formPath([$this->basePath, 'assets', $area, $key, 'webpack']);
@@ -107,7 +118,7 @@ class Webpack extends Console
                             $destination,
                             implode("\n", $collection)
                         )) {
-                            $this->console->info("\t* Webpack File for `{$handle}` in {$area} ==> {$key}.");
+                            $this->console->info("\t* Genrated `Webpack` Entry point for `{$handle}` in {$area} ==> {$key}.");
                         } else {
                             $this->console->warn("Unable to create Webpack  for `{$handle}` in {$area} ==> {$theme}.");
                         }
@@ -119,6 +130,56 @@ class Webpack extends Console
             $this->console->error("Unexpectedly something went wrong during deployment.");
         }
     }
+
+    protected function getAssetPath($type, $assets)
+    {
+        if(in_array($type, ['css', 'js'])) {
+            $callFn = 'parse'.ucfirst($type).'Contents';
+            return $this->$callFn($assets);
+        }
+
+        $langParser = $this->config->get('theme.webpack.additional.'.$type, false);
+
+        if($langParser !== false) {
+            return $this->app->make($langParser)->handle($assets);
+        }
+
+        return [];
+
+    }
+
+    /**
+     * Parse the given string of asset to get the asset links
+     *
+     * @param string $contents
+     * @return array
+     */
+    protected function parseCssContents($contents) 
+    {
+        if(preg_match_all('/href=["\']([^"\']+)["\']/i', $contents, $links, PREG_PATTERN_ORDER)) {
+            return array_filter(array_map(function($link) {
+                return str_replace(['%baseurl', 'theme.css'], '', $link);
+            }, $links[1]));
+        }
+        return [];
+    }
+
+     /**
+     * Parse the given string of asset to get the asset links
+     *
+     * @param string $contents
+     * @return array
+     */
+    protected function parseJsContents($contents) 
+    {
+        
+        if(preg_match_all('/src=["\']([^"\']+)["\']/i', $contents, $links, PREG_PATTERN_ORDER)) {
+            return array_map(function($link) {
+                return str_replace('%baseurl', '', $link);
+            }, $links[1]);
+        }
+        return [];
+    }   
 
     protected function readConfig()
     {

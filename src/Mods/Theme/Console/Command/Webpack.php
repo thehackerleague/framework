@@ -60,7 +60,7 @@ class Webpack extends Command
         $clear->clear($areas, $theme, $module, $type, true);
         $deployer->deploy($areas, $theme, $module, $type);
         $preprocessor->process($areas, $theme);
-        $complier->compile($areas, $theme, $module, 'img');
+        $complier->compile($areas, $theme, $module, ['img']);
         $webpack->compile($areas, $theme);
     }
 

@@ -81,6 +81,7 @@ class Deployer extends Console
 
     public function deploy($areas, $theme = null, $module = null, $type = null)
     {
+        $basePath = $this->basePath;
         foreach ($areas as $area) {
             $this->info("Deloying asset for {$area} section");
             $areaHints = $this->assetResolver->getHints($area, $module);
@@ -102,7 +103,7 @@ class Deployer extends Console
             }
 
 
-            $response = $this->events->fire('theme.asset.deploy.after', compact('area', 'areaPaths', 'areaHints', 'type'));
+            $response = $this->events->fire('theme.asset.deploy.after', compact('area', 'areaPaths', 'basePath', 'type'));
 
             $this->table(['Asset Deploy After Event'], $response);
             
@@ -118,6 +119,7 @@ class Deployer extends Console
     {
         $manifest = [];
         $assets = $this->config->get('theme.asset', []);
+        $modulePaths = $this->config->get('module.paths', []);
 
         $areas = array_merge(['frontend'], array_values($this->config->get('app.areas', [])));
         foreach ($areas as $area) {
@@ -131,7 +133,7 @@ class Deployer extends Console
             [$this->basePath, 'assets', 'config.json']
         );
         $this->files->put(
-            $configPath, json_encode(['assets' => $assets, 'areas' => $manifest], JSON_PRETTY_PRINT)
+            $configPath, json_encode(['assets' => $assets, 'areas' => $manifest, 'modulePaths' => $modulePaths], JSON_PRETTY_PRINT)
         );
     }
 

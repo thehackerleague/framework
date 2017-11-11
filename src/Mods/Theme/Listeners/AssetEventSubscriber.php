@@ -4,32 +4,16 @@ namespace Mods\Theme\Listeners;
 
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Contracts\Foundation\Application;
 
 class AssetEventSubscriber
 {
-
-	/**
-     * The config instance.
-     *
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $config;
-
     /**
      * The filesystem instance.
      *
      * @var \Illuminate\Filesystem\Filesystem
      */
     protected $files;
-
-    /**
-     * Resource location
-     *
-     * @var string
-     */
-    protected $basePath;
 
     /**
      * Event Response
@@ -42,40 +26,33 @@ class AssetEventSubscriber
      * Create a new config cache command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  \Illuminate\Contracts\Config\Repository  $config
-     * @param  \Illuminate\Contracts\Foundation\Application $app
      * @return void
      */
     public function __construct(
-        Filesystem $files,
-        ConfigContract $config,
-        Application $app
+        Filesystem $files
     ) {
         $this->files = $files;
-        $this->config = $config;
-        $this->basePath = $app['path.resources'];
     }
 
     /**
-     * Handle user asset is deployed events.
+     * Handle asset is deployed events.
      */
-    public function onDeployAfter($area, $areaPaths, $areaHints, $type) {
+    public function onDeployAfter($area, $areaPaths, $basePath, $type) {
 
     	if(empty($type) || in_array('css', $type)) {
-	    	$this->combineModuleAssests($area, $areaPaths);
-	    	//$this->combineFonts($area, $areaPaths, $areaHints);
-            $this->patchBaseUrl($area, $areaPaths, $areaHints);
+	    	//$this->combineFonts($area, $areaPaths, $basePath);
+            $this->patchBaseUrl($area, $areaPaths, $basePath);
 	    }
 
     	return [$this->response];
     }
 
-    protected function patchBaseUrl($area, $areaPaths, $areaHints)
+    protected function patchBaseUrl($area, $areaPaths, $basePath)
     {
         foreach ($areaPaths as $themekey => $locations) {
 
             $themePath = formPath(
-                [$this->basePath, 'assets', $area, $themekey, 'css']
+                [$basePath, 'assets', $area, $themekey, 'css']
             );
 
              $files = Finder::create()->files()
@@ -92,12 +69,12 @@ class AssetEventSubscriber
         }
     }
 
-    protected function combineFonts($area, $areaPaths, $areaHints)
+    protected function combineFonts($area, $areaPaths, $basePath)
     {
     	foreach ($areaPaths as $themekey => $locations) {
 
     		$fontPath = formPath(
-                [$this->basePath, 'assets', $area, $themekey, 'fonts']
+                [$basePath, 'assets', $area, $themekey, 'fonts']
             );
 
             if ($this->files->exists($fontPath)) {
@@ -116,29 +93,6 @@ class AssetEventSubscriber
             
         }
 
-    }
-
-    protected function combineModuleAssests($area, $areaPaths)
-    {
-        foreach ($areaPaths as $themekey => $locations) {
-            foreach (['scss' => 'scss', 'less' => 'less'] as $lang => $ext) {
-                $themePath = formPath(
-                    [$this->basePath, 'assets', $area, $themekey, $lang]
-                );
-                if ($this->files->exists($themePath)) {
-                    $import = ['$base-url: '.'"/assets/'.$area.'/'.$themekey.'/";'];
-                    $files = Finder::create()->files()
-                        ->name('_theme.'.$ext)
-                        ->name('_module.'.$ext)
-                        ->in([$themePath]);   
-                    foreach ($files as $file) {
-                        $import[] = "@import \"{$file->getRelativePathName()}\";";
-                    }
-                    $this->response .="  => Combining `{$ext}` in `{$area}` area for `{$themekey}` theme.\n";
-                    $this->writeThemeFiles($import, 'theme.'.$ext, $themePath);
-                }
-            }
-        }
     }
 
     protected function writeThemeFiles($content, $name, $path)

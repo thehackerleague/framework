@@ -136,6 +136,7 @@ class ThemeServiceProvider extends ServiceProvider
 
         $this->app->singleton('theme.webpack', function ($app) {
             return new Asset\Webpack(
+                $app,
                 $app['files'],
                 $app['theme.asset.resolver'],
                 $app['config'],

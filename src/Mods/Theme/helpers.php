@@ -1,8 +1,8 @@
 <?php
 
 if (! function_exists('formPath')) {
-    function formPath($paths)
+    function formPath($paths, $separator = DIRECTORY_SEPARATOR)
     {
-        return implode(DIRECTORY_SEPARATOR, $paths);
+        return implode($separator, $paths);
     }
 }
