@@ -88,7 +88,7 @@ class PreProcess extends Console
             $this->info("Pre Processing for {$area} section.");
             $manifest[$area] = [];
             $this->application['area'] = $area;
-            $handles = $pageUpdates->resetHandle()->collectHandlesFromUpdates();
+            $handles = array_unique($pageUpdates->resetHandle()->collectHandlesFromUpdates());
             $currentTheme = $this->themeResolver->getActive($area);
             $themes = $this->themeResolver->themeCollection($area);
             $themes = $themes->only($inputTheme);
