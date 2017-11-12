@@ -118,6 +118,7 @@ class Deployer extends Console
     protected function writeConfig()
     {
         $manifest = [];
+        $themeConfig = [];
         $assets = $this->config->get('theme.asset', []);
         $modulePaths = $this->config->get('module.paths', []);
 
@@ -125,6 +126,9 @@ class Deployer extends Console
         foreach ($areas as $area) {
             $themes = $this->themeResolver->themeCollection($area);
             foreach ($themes as $key => $theme) {
+                $themeConfig[$area][$key] = [
+                    'parent' => $theme->getParent()
+                ];
                 $manifest[$area][$key] = array_flip($assets);
             }
         }
@@ -133,7 +137,12 @@ class Deployer extends Console
             [$this->basePath, 'assets', 'config.json']
         );
         $this->files->put(
-            $configPath, json_encode(['assets' => $assets, 'areas' => $manifest, 'modulePaths' => $modulePaths], JSON_PRETTY_PRINT)
+            $configPath, json_encode([
+                'assets' => $assets, 
+                'areas' => $manifest, 
+                'modulePaths' => $modulePaths,
+                'themes' => $themeConfig
+            ], JSON_PRETTY_PRINT)
         );
     }
 

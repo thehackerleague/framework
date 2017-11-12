@@ -101,7 +101,7 @@ class Webpack extends Console
                         foreach ($aAssets as $type) {
                             //if(!isset($assets[$type]) || !is_array($assets[$type])) { continue; }
                             $mutatedValue = array_map(function ($url) use ($area, $key, $type) {
-                                $fullPath = formPath(['themePath', $area, $key, $type, $url], '/');
+                                $fullPath = formPath(['themePath', $type, $url], '/');
                                 return "require('$fullPath')";
                             }, $this->getAssetPath($type, $assets[$type][$handle]));
                             $collection = array_merge($collection, $mutatedValue);
