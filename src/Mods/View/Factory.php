@@ -81,10 +81,20 @@ class Factory
         $routeHandler = $this->pageFactory->routeHandler();
 
         if (isset($manifest['webpack']) && $manifest['webpack']) {
-            $head['js'] = '<script src="'.$this->getAssetBaseUrl($area."/".$theme).'vendor.js"></script>'."\n".
-                          '<script src="'.$this->getAssetBaseUrl($area."/".$theme).$routeHandler.'.js"></script>';
-                          
-            $head['css'] = '<link href="'.$this->getAssetBaseUrl($area."/".$theme).$routeHandler.'.css" media="all" rel="stylesheet" />';
+            $handleAsset = $manifest['compiledAsset'][$routeHandler];
+            $js = $css = '';
+            foreach ($handleAsset['js'] as $value) {
+                $js .=  $this->getJsTag($this->getAssetBaseUrl($area."/".$theme).$value);
+            }
+
+            $head['js'] = $js;
+
+            foreach ($handleAsset['css'] as $value) {
+                $css .=  $this->getCsssTag($this->getAssetBaseUrl($area."/".$theme).$value);
+            }
+
+            $head['css'] = $css;
+
         } elseif (isset($manifest['bundled']) && $manifest['bundled']) {
             $name = md5($area.$theme.$routeHandler);
             $head['js'] = '<script src="'.$this->getJsBaseUrl($area, $theme).'bundle/'.$name.'.js"></script>';
@@ -101,6 +111,28 @@ class Factory
             );
         }
         return $head;
+    }
+
+    /**
+     * Get the js tag
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function getJsTag($name)
+    {
+        return '<script src="'.$name.'"></script>'."\n";
+    }
+
+    /**
+     * Get the css tag
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function getCsssTag($name)
+    {
+        return '<link href="'.$name.'" media="all" rel="stylesheet" />'."\n";
     }
 
     /**
