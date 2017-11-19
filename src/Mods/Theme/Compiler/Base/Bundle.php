@@ -52,7 +52,7 @@ abstract class Bundle implements Compiler
         }
         $basePaths = [
             $this->container['path.public'], 'assets', $area,
-            $theme, $this->getType(), 'bundle'
+            $theme, $this->getType()
         ];
         $destination = formPath($basePaths);
         if (!$this->files->isDirectory($destination)) {

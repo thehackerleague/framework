@@ -62,7 +62,7 @@ class AssetEventSubscriber
 
             foreach ($files as $file) {
                 $realPath = $file->getRealPath();
-                $this->files->put($file->getRealPath(),str_replace('@{baseurl}',"/assets/$area/$themekey/", $file->getContents()));
+                $this->files->put($file->getRealPath(),str_replace('@{baseurl}',"../", $file->getContents()));
             }
 
             $this->response .="  => Patching Base-Url...\n";
