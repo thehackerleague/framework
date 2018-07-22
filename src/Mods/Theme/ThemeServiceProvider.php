@@ -82,10 +82,14 @@ class ThemeServiceProvider extends ServiceProvider
         $this->app->singleton('command.theme.webpack', function ($app) {
             return new Command\Webpack();
         });
+        $this->app->singleton('command.theme.watch', function ($app) {
+            return new Command\Watch();
+        });
+
         $this->commands([
             'command.theme.deploy', 'command.theme.clear',
             'command.theme.preprocessor', 'command.theme.compile',
-            'command.theme.webpack'
+            'command.theme.webpack', 'command.theme.watch'
         ]);
 
         $this->app->singleton('theme.deployer', function ($app) {
@@ -157,7 +161,7 @@ class ThemeServiceProvider extends ServiceProvider
             return [
                 'command.theme.deploy', 'command.theme.clear',
                 'command.theme.preprocessor', 'command.theme.compile',
-                'command.theme.webpack'
+                'command.theme.webpack', 'command.theme.watch'
             ];
         }
     }

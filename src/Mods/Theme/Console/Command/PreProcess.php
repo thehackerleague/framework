@@ -22,7 +22,7 @@ class PreProcess extends Command
      *
      * @var string
      */
-    protected $description = 'Pre Process the assets.';
+    protected $description = 'Pre Process the layout and collect the assets info.';
 
     /**
      * Execute the console command.

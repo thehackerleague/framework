@@ -85,7 +85,7 @@ class PreProcess extends Console
         $page = $this->viewFactory->getPageFactory();
         $pageUpdates = $page->getLayout()->getUpdate();
         foreach ($areas as $area) {
-            $this->info("Pre Processing for {$area} section.");
+            $this->info("Pre Processing Layout for {$area} section.");
             $manifest[$area] = [];
             $this->application['area'] = $area;
             $handles = array_unique($pageUpdates->resetHandle()->collectHandlesFromUpdates());
