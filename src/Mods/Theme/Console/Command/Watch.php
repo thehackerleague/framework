@@ -73,9 +73,9 @@ class Watch extends Command
 
             $this->watcher->wait(function ($type, $buffer) use($area, $theme) {
                 if (Process::ERR === $type) {
-                    echo 'ERR > '.$buffer;
+                    $this->error('ERR > '.$buffer);
                 } else {
-                    echo 'NODE > '.$buffer;
+                    $this->line('NODE > '.$buffer);
                     if(trim($buffer) == '__CHNAGED__') {
                         $this->callCompiler($area, $theme);
                     }

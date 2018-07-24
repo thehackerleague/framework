@@ -157,9 +157,13 @@ class Webpack extends Console
     protected function parseCssContents($contents) 
     {
         if(preg_match_all('/href=["\']([^"\']+)["\']/i', $contents, $links, PREG_PATTERN_ORDER)) {
-            return array_filter(array_map(function($link) {
+            $styles = array_filter(array_map(function($link) {
                 return str_replace(['%baseurl', 'theme.css'], '', $link);
             }, $links[1]));
+
+            return array_map(function($url) {
+                return $url . '?nomodule';
+            }, $styles);
         }
         return [];
     }
