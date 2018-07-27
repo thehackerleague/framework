@@ -1,5 +1,6 @@
 <?php
 
+use Layout\Core\Exceptions\InvalidRouterHandleException;
 
 if (! function_exists('layout')) {
     /**
@@ -20,11 +21,12 @@ if (! function_exists('render')) {
 	/**
      * Render the layout for the current route.
      *
+     * @param string $handle
      * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
-    function render()
+    function render($handle = null)
     {
-        return app(Mods\View\Factory::class)->render();
+        return layout()->render($handle?:getCurrentRoute());
     }
 }
 
@@ -54,5 +56,25 @@ if (! function_exists('stripQuotes')) {
     function stripQuotes($expression)
     {
         return str_replace("'", '', $expression);
+    }
+}
+
+if (! function_exists('getCurrentRoute')) {
+    /**
+     * Get the current router name in snake case.
+     *
+     * @throws InvalidRouterHandleException
+     * @return string
+     */
+    function getCurrentRoute()
+    {
+        $routeName = \Route::currentRouteName();
+        $routerHandler = str_replace('.', '_', strtolower($routeName));
+        if (empty($routerHandler) || is_null($routerHandler)) {
+            if (app('config')->get('layout.strict', false)) {
+                throw new InvalidRouterHandleException('Invalid Router Handle supplied');
+            }
+        }
+        return $routerHandler;
     }
 }

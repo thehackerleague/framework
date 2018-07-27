@@ -31,11 +31,12 @@ class Factory
     /**
      * Render the current page and return view
      *
+     * @param string $handle
      * @return \Illuminate\View\View
      */
-    public function render()
+    public function render($handle)
     {
-        $html = $this->pageFactory->render();
+        $html = $this->pageFactory->render($handle);
         $html['head'] = $this->updateAssetUrls($html['head']);
         return view('root', $html);
     }
@@ -52,7 +53,7 @@ class Factory
         if (is_array($key)) {
             view()->share($key);
         } else {
-           view()->share($key,  $value);
+            view()->share($key,  $value);
         }
 
         return $this;
@@ -78,27 +79,27 @@ class Factory
         $area = app()->area();
         $theme = $this->themeFactory->getActiveTheme($area);
         $manifest = $this->fetchManifest($area, $theme);
-        $routeHandler = $this->pageFactory->routeHandler();
+        $routeHandler = $this->pageFactory->currentHandle();
 
         if (isset($manifest['webpack']) && $manifest['webpack']) {
             $handleAsset = $manifest['compiledAsset'][$routeHandler];
             $js = $css = '';
             foreach ($handleAsset['js'] as $value) {
-                $js .=  $this->getJsTag($this->getAssetBaseUrl($area."/".$theme).$value);
+                $js .=  $this->getScriptTag($this->getAssetBaseUrl($area."/".$theme).$value);
             }
 
             $head['js'] = $js;
 
             foreach ($handleAsset['css'] as $value) {
-                $css .=  $this->getCsssTag($this->getAssetBaseUrl($area."/".$theme).$value);
+                $css .=  $this->getStyleTag($this->getAssetBaseUrl($area."/".$theme).$value);
             }
 
             $head['css'] = $css;
 
         } elseif (isset($manifest['bundled']) && $manifest['bundled']) {
             $name = md5($area.$theme.$routeHandler);
-            $head['js'] = '<script src="'.$this->getJsBaseUrl($area, $theme).$name.'.js"></script>';
-            $head['css'] = '<link href="'.$this->getCssBaseUrl($area, $theme).$name.'.css" media="all" rel="stylesheet" />';
+            $head['js'] = $this->getScriptTag($this->getJsBaseUrl($area, $theme).$name.'.js');
+            $head['css'] = $this->getStyleTag($this->getCssBaseUrl($area, $theme).$name.'.css');
         } else {
             $minified = (isset($manifest['minified']) && $manifest['minified']);
             $head['js'] = str_replace(
@@ -114,25 +115,25 @@ class Factory
     }
 
     /**
-     * Get the js tag
+     * Get the script tag
      *
-     * @param string $name
+     * @param string $url
      * @return string
      */
-    protected function getJsTag($name)
+    protected function getScriptTag($url)
     {
         return '<script src="'.$name.'"></script>'."\n";
     }
 
     /**
-     * Get the css tag
+     * Get the style tag
      *
-     * @param string $name
+     * @param string $url
      * @return string
      */
-    protected function getCsssTag($name)
+    protected function getStyleTag($url)
     {
-        return '<link href="'.$name.'" media="all" rel="stylesheet" />'."\n";
+        return '<link href="'.$url.'" media="all" rel="stylesheet" />'."\n";
     }
 
     /**
