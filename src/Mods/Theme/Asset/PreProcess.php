@@ -83,12 +83,12 @@ class PreProcess extends Console
         $oldLayoutXmlLocation = $this->config->get('layout.xml_location');
 
         $page = $this->viewFactory->getPageFactory();
-        $pageUpdates = $page->getLayout()->getUpdate();
+        $pageUpdates = $page->layout()->manager();
         foreach ($areas as $area) {
             $this->info("Pre Processing Layout for {$area} section.");
             $manifest[$area] = [];
             $this->application['area'] = $area;
-            $handles = array_unique($pageUpdates->resetHandle()->collectHandlesFromUpdates());
+            $handles = array_unique($pageUpdates->resetHandle()->collectHandles());
             $currentTheme = $this->themeResolver->getActive($area);
             $themes = $this->themeResolver->themeCollection($area);
             $themes = $themes->only($inputTheme);
@@ -102,12 +102,14 @@ class PreProcess extends Console
                         continue;
                     }
                     $this->info("\t* Preparing Asset config for `{$handle}`", OutputInterface::VERBOSITY_DEBUG);
-                    $page->resetPage()
-                        ->addHandle('default')
-                        ->addHandle($handle)
-                        ->buildLayout();
+                    $page->reset()
+                        ->addHandle([
+                            'default',
+                            $handle
+                        ])
+                        ->build();
                     $manifest[$area][$themeName] = $this->prepareAsset(
-                        $page->getLayout()->generateHeadElemets(),
+                        $page->layout()->generateHeadElemets(),
                         $handle,
                         $manifest[$area][$themeName]
                     );
