@@ -122,7 +122,7 @@ class Factory
      */
     protected function getScriptTag($url)
     {
-        return '<script src="'.$name.'"></script>'."\n";
+        return '<script src="'.$url.'"></script>'."\n";
     }
 
     /**

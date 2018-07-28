@@ -16,11 +16,17 @@ class Cache implements Cacheable
         $this->_cache = $cache;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function get($key, $default = null)
     {
         return $this->_cache->get($key, $default);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function put($key, $data, $time, $tags = [])
     {
         if (!\Cache::getStore() instanceof TaggableStore) {
@@ -30,6 +36,9 @@ class Cache implements Cacheable
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function forever($key, $data, $tags = [])
     {
         if (!\Cache::getStore() instanceof TaggableStore) {

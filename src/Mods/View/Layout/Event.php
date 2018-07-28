@@ -14,11 +14,17 @@ class Event implements EventsDispatcher
         $this->_event = $event;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function listen($event, $listener, $priority = 0)
     {
         return $this->_event->listen($event, $listener, $priority);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function fire($event, array $payload = [])
     {
         return $this->_event->fire($event, $payload);

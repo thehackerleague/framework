@@ -14,6 +14,9 @@ class Config implements ConfigResolver
         $this->_config = $config;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function get($key, $default = null)
     {        
         if ($key == 'handle_layout_section') {
@@ -21,7 +24,7 @@ class Config implements ConfigResolver
         }
         return $this->_config->get('layout.'.$key, $default);
     }
-
+    
     public function getCurrentLayoutSection()
     {
         return app()->area();

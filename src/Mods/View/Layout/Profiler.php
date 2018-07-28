@@ -7,6 +7,9 @@ use Layout\Core\Contracts\Profiler as ProfilerContract;
 
 class Profiler implements ProfilerContract
 {
+    /**
+     * {@inheritDoc}
+     */
     public function start($key)
     {
         if (config('debugbar.enabled', false)) {
@@ -14,6 +17,9 @@ class Profiler implements ProfilerContract
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function stop($key)
     {
         if (config('debugbar.enabled', false)) {
