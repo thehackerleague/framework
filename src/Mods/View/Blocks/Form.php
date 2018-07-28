@@ -42,19 +42,45 @@ class Form extends BaseBlock
 	/**
 	* {@inheritdoc}
 	*/
-    protected function _beforeToHtml()
+    protected function beforeToHtml()
     {   
         $this->formInstance = app()->make($this->form);
 
-        $this->assign('form', 
-            $this->getLayout()
-                ->createBlock(EmptyBlock::class, 'form.elements')
-                ->setTemplate('form.elements')
-                ->assign($this->formInstance->build())
-                ->toHtml()
-        );
+        $form = $this->formInstance->build();
+        
+        $this->setOpen($form);
+        $this->setFields($form);
+        $this->setActions($form);
+        $this->setClose();
 
         return $this;
+    }
+
+    protected function setOpen($form)
+    {   
+        return $this->addChild('form.open', EmptyBlock::class)
+                ->setTemplate('form.open')
+                ->assign($form);
+    }
+
+    protected function setFields($form)
+    {   
+        return $this->addChild('form.elements', EmptyBlock::class)
+                ->setTemplate('form.elements')
+                ->assign($form);
+    }
+
+    protected function setActions($form)
+    {
+        return $this->addChild('form.actions', EmptyBlock::class)
+                ->setTemplate('form.actions')
+                ->assign($form);
+    }
+
+    protected function setClose()
+    {
+        return $this->addChild('form.close', EmptyBlock::class)
+                ->setTemplate('form.close');
     }
 
     /**
